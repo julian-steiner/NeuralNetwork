@@ -1,0 +1,34 @@
+Start testing: Apr 14 23:59 W. Europe Daylight Time
+----------------------------------------------------------
+1/1 Testing: Test
+1/1 Test: Test
+Command: "C:/dev/cpp/NeuralNetwork/build/Test.exe"
+Directory: C:/dev/cpp/NeuralNetwork/build
+"Test" start time: Apr 14 23:59 W. Europe Daylight Time
+Output:
+----------------------------------------------------------
+Running main() from ../googletest/googletest/src/gtest_main.cc
+[==========] Running 2 tests from 2 test suites.
+[----------] Global test environment set-up.
+[----------] 1 test from Neuron
+[ RUN      ] Neuron.NeuronInitializedCorrectly
+[       OK ] Neuron.NeuronInitializedCorrectly (0 ms)
+[----------] 1 test from Neuron (0 ms total)
+
+[----------] 1 test from Connection
+[ RUN      ] Connection.ConnectionInitializedCorrectly
+[       OK ] Connection.ConnectionInitializedCorrectly (0 ms)
+[----------] 1 test from Connection (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 2 tests from 2 test suites ran. (0 ms total)
+[  PASSED  ] 2 tests.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"Test" end time: Apr 14 23:59 W. Europe Daylight Time
+"Test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Apr 14 23:59 W. Europe Daylight Time
