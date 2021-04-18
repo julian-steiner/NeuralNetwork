@@ -10,6 +10,7 @@ include_directories(Neuron/head Network/head)
 
 set(Sources
     Neuron/src/Neuron.cpp
+    Network/src/NetworkBuffer.cpp
     Network/src/NeuralNetwork.cpp
 )
 

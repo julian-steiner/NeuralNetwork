@@ -1,27 +1,18 @@
-#ifndef NEURALNETWORK
-#define NEURALNETWORK
+#ifndef NEURALNETWORKHEADER
+#define NEURALNETWORKHEADER
 
 #include <vector>
 #include <memory>
-#include "Neuron.h"
+#include "NetworkBuffer.h"
 
 namespace nn
 {
+    enum optimizers {SGD};
 
-    enum LayerType {FullyConnected};
-
-    struct NetworkBuffer
+    class NeuralNetwork : public NetworkBuffer
     {
-        int previousLayerSize;
-        int inputLayerSize;
-        std::vector<std::shared_ptr<neuron::Neuron>> neurons;
-        std::vector<std::shared_ptr<connection::Connection>> connections;
-
-        NetworkBuffer();
-        void addConnection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuron::Neuron> out);
-        void addConnection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuron::Neuron> out, int innovationNumber);
-        void addNeuron(std::shared_ptr<neuron::Neuron>);
-        void addLayer(int numNeurons, neuron::Activation activation, LayerType type);
+        std::vector<double> predict(std::vector<double> inputs);
+        std::vector<double> train(std::vector<std::vector<double>> inputs, int cycles, nn::optimizers optimizer);
     };
 }
 

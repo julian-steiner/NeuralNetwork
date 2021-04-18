@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include "NetworkBuffer.h"
 #include "NeuralNetwork.h"
 #include <cstdlib>
 
@@ -50,4 +51,35 @@ TEST(NetworkBuffer, LayersCorrectlyAdded)
     ASSERT_EQ(testNetwork.previousLayerSize, 2);
     ASSERT_EQ(testNetwork.neurons.at(5)->type, neuron::NeuronType::Input);
     ASSERT_EQ(testNetwork.neurons.at(15)->type, neuron::NeuronType::Hidden);
+}
+
+TEST(NetworkBuffer, ConnectionsCorrectlyAdded)
+{
+    nn::NetworkBuffer testNetwork;
+
+    testNetwork.addLayer(10, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
+    testNetwork.addLayer(20, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
+    testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
+
+    testNetwork.connectNetwork();
+
+    ASSERT_EQ(testNetwork.neurons.at(0)->connections_forward.size(), 20);
+    ASSERT_EQ(testNetwork.neurons.at(15)->connections_back.size(), 10);
+    ASSERT_EQ(testNetwork.neurons.at(31)->connections_forward.size(), 0);
+    ASSERT_EQ(testNetwork.neurons.at(31)->connections_back.size(), 20);
+}
+
+TEST(NeuralNetwork, NetworkInheritanceWorkingCorrectly)
+{
+    nn::NeuralNetwork testNetwork; 
+    testNetwork.addLayer(10, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
+    testNetwork.addLayer(20, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
+    testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
+
+    testNetwork.connectNetwork();
+
+    ASSERT_EQ(testNetwork.neurons.at(0)->connections_forward.size(), 20);
+    ASSERT_EQ(testNetwork.neurons.at(15)->connections_back.size(), 10);
+    ASSERT_EQ(testNetwork.neurons.at(31)->connections_forward.size(), 0);
+    ASSERT_EQ(testNetwork.neurons.at(31)->connections_back.size(), 20);
 }
