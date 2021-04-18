@@ -21,10 +21,18 @@ Connection::Connection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuro
     this->weight = 0;
 }
 
+void Connection::configureConnectedNeurons()
+{
+    this->in->connections_forward.push_back(std::make_shared<connection::Connection>(*this));
+    this->out->connections_back.push_back(std::make_shared<connection::Connection>(*this));
+}
+
 Neuron::Neuron(NeuronType type, Activation activation)
 {
     this->value = 0;
     this->bias = 0;
     this->type = type;
     this->activation = activation;
+    this->connections_forward = std::vector<std::shared_ptr<connection::Connection>>();
+    this->connections_back = std::vector<std::shared_ptr<connection::Connection>>();
 }
