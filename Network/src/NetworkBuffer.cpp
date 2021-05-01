@@ -1,4 +1,5 @@
 #include "NetworkBuffer.h"
+#include "Timer.h"
 
 using namespace nn;
 
@@ -27,11 +28,18 @@ void NetworkBuffer::addNeuron(std::shared_ptr<neuron::Neuron> neuron)
 
 void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, LayerType type)
 {
+    #ifdef PROFILING
+    timer::Timer a("addLayer");
+    #endif
+
     //Determining the layerType out of the network size
     //If the Network size is 0 then the layer has to be input
 
     int currentNetworkSize = this->neurons.size();
     neuron::NeuronType neuronType = neuron::NeuronType::Hidden;
+
+    //Reserve the space in the Neurons Vector to minimize copying
+    this->neurons.reserve(this->neurons.size() + numNeurons);
 
     if (currentNetworkSize == 0)
     {
@@ -50,6 +58,9 @@ void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, Laye
     switch (type)
     {
         case LayerType::FullyConnected:
+            //Reserving the space in the connections Vector
+            this->connections.reserve(this->connections.size() + (numNeurons * previousLayerSize));
+
             if(neuronType != neuron::NeuronType::Input)
             {
                 for(int i = currentNetworkSize; i < currentNetworkSize + numNeurons; i++)

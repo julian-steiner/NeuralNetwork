@@ -21,7 +21,7 @@ namespace nn
         NetworkBuffer();
         void addConnection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuron::Neuron> out);
         void addConnection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuron::Neuron> out, int innovationNumber);
-        void addNeuron(std::shared_ptr<neuron::Neuron>);
+        void addNeuron(std::shared_ptr<neuron::Neuron> neuron);
         void addLayer(int numNeurons, neuron::Activation activation, LayerType type);
         void connectNetwork();
     };
