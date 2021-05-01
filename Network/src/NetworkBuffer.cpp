@@ -13,24 +13,25 @@ NetworkBuffer::NetworkBuffer()
 
 void NetworkBuffer::addConnection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuron::Neuron> out)
 {
+    PROFILE_SCOPE("addConnection");
     this->connections.push_back(std::make_shared<connection::Connection>(connection::Connection(in, out)));
 }
 
 void NetworkBuffer::addConnection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuron::Neuron> out, int innovationNumber)
 {
+    PROFILE_SCOPE("addConnection");
     this->connections.push_back(std::make_shared<connection::Connection>(connection::Connection(in, out, innovationNumber)));
 }
 
 void NetworkBuffer::addNeuron(std::shared_ptr<neuron::Neuron> neuron)
 {
+    PROFILE_SCOPE("addNeuron");
     this->neurons.push_back(neuron);
 }
 
 void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, LayerType type)
 {
-    #ifdef PROFILING
-    timer::Timer a("addLayer");
-    #endif
+    PROFILE_SCOPE("addLayer");
 
     //Determining the layerType out of the network size
     //If the Network size is 0 then the layer has to be input
