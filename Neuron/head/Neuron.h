@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <iostream>
 
 namespace connection
 {
@@ -36,6 +37,7 @@ namespace connection
         double weight;
         bool enabled;
         int innovationNumber;
+        bool isConnected;
 
         Connection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuron::Neuron> out);
         Connection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuron::Neuron> out, int innovationNumber);

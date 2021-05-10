@@ -2,7 +2,6 @@
 #include "NetworkBuffer.h"
 #include "NeuralNetwork.h"
 #include <cstdlib>
-#include "Timer.h"
 
 TEST(NetworkBuffer, BufferInitializedCorrectly)
 {
@@ -56,9 +55,6 @@ TEST(NetworkBuffer, LayersCorrectlyAdded)
 
 TEST(NetworkBuffer, ConnectionsCorrectlyAdded)
 {
-    profiling::Instrumentor::Get().BeginSession("ConnectionsCorrectlyAdded");
-    PROFILE_SCOPE("ConnectionsCorrectlyAdded");
-
     nn::NetworkBuffer testNetwork;
 
     //testNetwork.addLayer(10, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
@@ -70,14 +66,10 @@ TEST(NetworkBuffer, ConnectionsCorrectlyAdded)
     testNetwork.addLayer(16, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
     testNetwork.addLayer(9, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
 
-    testNetwork.connectNetwork();
-
     //ASSERT_EQ(testNetwork.neurons.at(0)->connections_forward.size(), 20);
     //ASSERT_EQ(testNetwork.neurons.at(15)->connections_back.size(), 10);
     //ASSERT_EQ(testNetwork.neurons.at(31)->connections_forward.size(), 0);
     //ASSERT_EQ(testNetwork.neurons.at(31)->connections_back.size(), 20);
-
-    profiling::Instrumentor::Get().EndSession();
 }
 
 TEST(NeuralNetwork, NetworkInheritanceWorkingCorrectly)
@@ -86,8 +78,6 @@ TEST(NeuralNetwork, NetworkInheritanceWorkingCorrectly)
     testNetwork.addLayer(10, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
     testNetwork.addLayer(20, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
     testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
-
-    testNetwork.connectNetwork();
 
     ASSERT_EQ(testNetwork.neurons.at(0)->connections_forward.size(), 20);
     ASSERT_EQ(testNetwork.neurons.at(15)->connections_back.size(), 10);

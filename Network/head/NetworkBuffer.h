@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <memory>
-#include "Neuron.h"
+#include "../../Neuron/head/Neuron.h"
 
 namespace nn
 {
@@ -14,7 +14,6 @@ namespace nn
     {
         int previousLayerSize;
         int inputLayerSize;
-        bool isConnected = false;
         std::vector<std::shared_ptr<neuron::Neuron>> neurons;
         std::vector<std::shared_ptr<connection::Connection>> connections;
 
@@ -23,7 +22,6 @@ namespace nn
         void addConnection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuron::Neuron> out, int innovationNumber);
         void addNeuron(std::shared_ptr<neuron::Neuron> neuron);
         void addLayer(int numNeurons, neuron::Activation activation, LayerType type);
-        void connectNetwork();
     };
 }
 

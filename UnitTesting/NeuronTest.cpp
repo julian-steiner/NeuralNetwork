@@ -15,11 +15,14 @@ TEST(Connection, ConnectionInitializedCorrectly)
 {
     std::shared_ptr<neuron::Neuron> testNeuron = std::make_shared<neuron::Neuron>(neuron::Neuron(neuron::NeuronType::Output, neuron::Activation::Sigmoid));
     testNeuron->value = 54;
+
+    std::shared_ptr<neuron::Neuron> testNeuron2 = std::make_shared<neuron::Neuron>(neuron::Neuron(neuron::NeuronType::Output, neuron::Activation::Sigmoid));
+
     ASSERT_EQ(testNeuron->value, 54);
-    connection::Connection testConnection(testNeuron, nullptr);
+    connection::Connection testConnection(testNeuron, testNeuron2);
     
     ASSERT_EQ(testConnection.in, testNeuron);
-    ASSERT_EQ(testConnection.out, nullptr);
+    ASSERT_EQ(testConnection.out, testNeuron2);
     
     testNeuron->value = 10;
     

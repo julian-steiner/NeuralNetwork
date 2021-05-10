@@ -10,6 +10,8 @@ Connection::Connection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuro
     this->out = out;
     this->innovationNumber = 0;
     this->weight = 0;
+    this->isConnected = false;
+    this->configureConnectedNeurons();
 }
 
 Connection::Connection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuron::Neuron> out, int innovationNumber)
@@ -19,12 +21,22 @@ Connection::Connection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuro
     this->out = out;
     this->innovationNumber = innovationNumber;
     this->weight = 0;
+    this->isConnected = false;
+    this->configureConnectedNeurons();
 }
 
 void Connection::configureConnectedNeurons()
 {
-    this->in->connections_forward.push_back(std::make_shared<connection::Connection>(*this));
-    this->out->connections_back.push_back(std::make_shared<connection::Connection>(*this));
+    if (isConnected == false)
+    {
+        this->in->connections_forward.push_back(std::make_shared<connection::Connection>(*this));
+        this->out->connections_back.push_back(std::make_shared<connection::Connection>(*this));
+        this->isConnected = true;
+    }
+    else
+    {
+        std::cout << "Already Connected" << std::endl;
+    }
 }
 
 Neuron::Neuron(NeuronType type, Activation activation)
