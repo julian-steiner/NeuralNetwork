@@ -6,7 +6,7 @@ enable_testing()
 
 add_subdirectory(googletest)
 
-include_directories(Neuron/head Network/head Timer/head)
+include_directories(Neuron/head Network/head Timer/head googletest/include)
 
 add_definitions(-DPROFILING)
 

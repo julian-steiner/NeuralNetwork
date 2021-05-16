@@ -44,7 +44,83 @@ Neuron::Neuron(NeuronType type, Activation activation)
     this->value = 0;
     this->bias = 0;
     this->type = type;
+    this->rewriteCache = nullptr;
     this->activation = activation;
     this->connections_forward = std::vector<std::shared_ptr<connection::Connection>>();
     this->connections_back = std::vector<std::shared_ptr<connection::Connection>>();
+}
+
+Neuron::Neuron(NeuronType type, Activation activation, bool* rewriteCache)
+{
+    this->value = 0;
+    this->bias = 0;
+    this->type = type;
+    this->rewriteCache = rewriteCache;
+    this->activation = activation;
+    this->connections_forward = std::vector<std::shared_ptr<connection::Connection>>();
+    this->connections_back = std::vector<std::shared_ptr<connection::Connection>>();
+}
+
+double Neuron::calculate()
+{
+    // skip computation if the neuron is input
+    if (this->type != NeuronType::Input)
+    {
+        // compute if rewriteCache is set
+        if (this->rewriteCache != nullptr)
+        {
+            // compute if rewriteCache is true
+            if (*this->rewriteCache == true)
+            {
+                // reset the storages
+                this->weightedSumCache = 0; 
+
+                this->value = this->calculateSum();
+
+                // cache the sum
+                this->weightedSumCache = this->value;
+
+                // activate the sum
+                this->value = this->activate(this->value);
+            }
+        }
+
+        else
+        {
+            this->value = this->calculateSum();
+
+            // activate the sum
+            this->value = this->activate(this->value);
+        }
+    }
+
+    return this->value;
+}
+
+double Neuron::activate(double value)
+{
+    switch(this->activation)
+    {
+        case neuron::Activation::None:
+            return this->value;
+
+        case neuron::Activation::Sigmoid:
+            return 1 / (1 + exp(-value));
+        
+        default:
+            return 0;
+    }
+}
+
+double Neuron::calculateSum()
+{
+    double value_cache = 0;
+
+    // calculate the sum
+    for (std::shared_ptr<connection::Connection> connection : this->connections_back)
+    {
+       value_cache += connection->in->value;
+    }
+
+    value_cache += this->bias;
 }

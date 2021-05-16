@@ -11,6 +11,39 @@ TEST(Neuron, NeuronInitializedCorrectly)
     ASSERT_EQ(testNeuron->bias, 0);
 }
 
+TEST(Neuron, InputNeuronComputingCorrectly)
+{
+    std::shared_ptr<neuron::Neuron> testNeuron = std::make_shared<neuron::Neuron>(neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::None));
+    testNeuron->value = 53;
+    testNeuron->bias = 23103910;
+
+    double result = testNeuron->calculate();
+
+    ASSERT_EQ(result, 53);
+}
+
+TEST(Neuron, ComputingCorrectly)
+{
+    std::shared_ptr<neuron::Neuron> testNeuron = std::make_shared<neuron::Neuron>(neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid));
+    testNeuron->value = 54;
+
+    std::shared_ptr<neuron::Neuron> testNeuron2 = std::make_shared<neuron::Neuron>(neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid));
+    testNeuron2->value = 100;
+
+    bool cacheValue = NULL;
+    std::shared_ptr<neuron::Neuron> testNeuron3 = std::make_shared<neuron::Neuron>(neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, &cacheValue));
+    testNeuron3->bias = 1;
+
+    testNeuron3->connections_back.push_back(std::make_shared<connection::Connection>(connection::Connection(testNeuron, testNeuron3)));
+    testNeuron3->connections_back.push_back(std::make_shared<connection::Connection>(connection::Connection(testNeuron2, testNeuron3)));
+
+    double result = testNeuron3->calculate();
+    std::cout << testNeuron3->weightedSumCache << std::endl;
+    std::cout << result << std::endl;
+
+    ASSERT_EQ(true, false);
+}
+
 TEST(Connection, ConnectionInitializedCorrectly)
 {
     std::shared_ptr<neuron::Neuron> testNeuron = std::make_shared<neuron::Neuron>(neuron::Neuron(neuron::NeuronType::Output, neuron::Activation::Sigmoid));

@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <iostream>
+#include <cmath>
 
 namespace connection
 {
@@ -17,14 +18,27 @@ namespace neuron
 
     struct Neuron
     {
-        double value;
-        double bias;
         NeuronType type;
         Activation activation;
+
+        double value;
+        double bias;
+
+        bool* rewriteCache;
+        double weightedSumCache;
+
         std::vector<std::shared_ptr<connection::Connection>> connections_forward;
         std::vector<std::shared_ptr<connection::Connection>> connections_back;
 
         Neuron(NeuronType type, Activation activation);
+        Neuron(NeuronType type, Activation activation, bool* rewriteCache);
+
+        double calculate();
+        double feedForward();
+
+        private:
+        double calculateSum();
+        double activate(double value);
     };
 }
 
