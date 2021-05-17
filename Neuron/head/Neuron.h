@@ -5,6 +5,7 @@
 #include <memory>
 #include <iostream>
 #include <cmath>
+#include <random>
 
 namespace connection
 {
@@ -24,14 +25,13 @@ namespace neuron
         double value;
         double bias;
 
-        bool* rewriteCache;
+        std::shared_ptr<bool> rewriteCache;
         double weightedSumCache;
 
         std::vector<std::shared_ptr<connection::Connection>> connections_forward;
         std::vector<std::shared_ptr<connection::Connection>> connections_back;
 
-        Neuron(NeuronType type, Activation activation);
-        Neuron(NeuronType type, Activation activation, bool* rewriteCache);
+        Neuron(NeuronType type, Activation activation, bool has_cache = true);
 
         double calculate();
         double feedForward();

@@ -3,7 +3,10 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/Network/head/**",
+                "${workspaceFolder}/Neuron/head/**",
+                "${workspaceFolder}/googletest/googletest/**"
             ],
             "defines": [
                 "_DEBUG",

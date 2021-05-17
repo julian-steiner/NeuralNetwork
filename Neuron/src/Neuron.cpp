@@ -9,7 +9,7 @@ Connection::Connection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuro
     this->in = in;
     this->out = out;
     this->innovationNumber = 0;
-    this->weight = 0;
+    this->weight = std::rand() / RAND_MAX * 2 - 1;
     this->isConnected = false;
     this->configureConnectedNeurons();
 }
@@ -20,7 +20,7 @@ Connection::Connection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuro
     this->in = in;
     this->out = out;
     this->innovationNumber = innovationNumber;
-    this->weight = 0;
+    this->weight = std::rand() / RAND_MAX * 2 - 1;
     this->isConnected = false;
     this->configureConnectedNeurons();
 }
@@ -39,23 +39,22 @@ void Connection::configureConnectedNeurons()
     }
 }
 
-Neuron::Neuron(NeuronType type, Activation activation)
+Neuron::Neuron(NeuronType type, Activation activation, bool has_cache)
 {
     this->value = 0;
     this->bias = 0;
     this->type = type;
-    this->rewriteCache = nullptr;
-    this->activation = activation;
-    this->connections_forward = std::vector<std::shared_ptr<connection::Connection>>();
-    this->connections_back = std::vector<std::shared_ptr<connection::Connection>>();
-}
 
-Neuron::Neuron(NeuronType type, Activation activation, bool* rewriteCache)
-{
-    this->value = 0;
-    this->bias = 0;
-    this->type = type;
-    this->rewriteCache = rewriteCache;
+    if (has_cache)
+    {
+        this->rewriteCache = std::make_shared<bool>(true);
+    }
+
+    else
+    {
+        this->rewriteCache = nullptr;
+    }
+
     this->activation = activation;
     this->connections_forward = std::vector<std::shared_ptr<connection::Connection>>();
     this->connections_back = std::vector<std::shared_ptr<connection::Connection>>();
@@ -119,8 +118,10 @@ double Neuron::calculateSum()
     // calculate the sum
     for (std::shared_ptr<connection::Connection> connection : this->connections_back)
     {
-       value_cache += connection->in->value;
+       value_cache += connection->in->value * connection->weight;
     }
 
     value_cache += this->bias;
+
+    return value_cache;
 }

@@ -1,4 +1,4 @@
-#include "../../Network/head/NetworkBuffer.h"
+#include "NetworkBuffer.h"
 
 using namespace nn;
 
