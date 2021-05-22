@@ -14,13 +14,19 @@ namespace nn
     {
         int previousLayerSize;
         int inputLayerSize;
-        std::vector<std::shared_ptr<neuron::Neuron>> neurons;
-        std::vector<std::shared_ptr<connection::Connection>> connections;
+        std::vector<neuron::Neuron> neurons;
+        std::vector<connection::Connection> connections;
 
         NetworkBuffer();
-        void addConnection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuron::Neuron> out);
-        void addConnection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuron::Neuron> out, int innovationNumber);
-        void addNeuron(std::shared_ptr<neuron::Neuron> neuron);
+
+        void addConnection(neuron::Neuron* in, neuron::Neuron* out);
+        void addConnection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber);
+        void addNeuron(neuron::Neuron&& neuron);
+
+        void addNeuron(neuron::NeuronType type, neuron::Activation activation);
+        void connect(int inNeuronNumber, int outNeuronNumber);
+
+        //TODO: Fix the bug that addLayer changes the pointers
         void addLayer(int numNeurons, neuron::Activation activation, LayerType type);
     };
 }

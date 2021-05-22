@@ -3,7 +3,7 @@
 using namespace neuron;
 using namespace connection;
 
-Connection::Connection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuron::Neuron> out)
+Connection::Connection(neuron::Neuron* in, neuron::Neuron* out)
 {
     this->enabled = true;
     this->in = in;
@@ -14,7 +14,7 @@ Connection::Connection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuro
     this->configureConnectedNeurons();
 }
 
-Connection::Connection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuron::Neuron> out, int innovationNumber)
+Connection::Connection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber)
 {
     this->enabled = true;
     this->in = in;
@@ -25,12 +25,25 @@ Connection::Connection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuro
     this->configureConnectedNeurons();
 }
 
+Connection::Connection(neuron::Neuron* in, neuron::Neuron* out, int inNeuronNumber, int outNeuronNumber)
+{
+    this->enabled = true;
+    this->in = in;
+    this->out = out;
+    this->innovationNumber = 0;
+    this->weight = std::rand() / RAND_MAX * 2 - 1;
+    this->isConnected = false;
+    this->inNeuronNumber = inNeuronNumber;
+    this->outNeuronNumber = outNeuronNumber;
+    this->configureConnectedNeurons();
+}
+
 void Connection::configureConnectedNeurons()
 {
     if (isConnected == false)
     {
-        this->in->connections_forward.push_back(std::make_shared<connection::Connection>(*this));
-        this->out->connections_back.push_back(std::make_shared<connection::Connection>(*this));
+        this->in->connections_forward.push_back(this);
+        this->out->connections_back.push_back(this);
         this->isConnected = true;
     }
     else
@@ -56,8 +69,8 @@ Neuron::Neuron(NeuronType type, Activation activation, bool has_cache)
     }
 
     this->activation = activation;
-    this->connections_forward = std::vector<std::shared_ptr<connection::Connection>>();
-    this->connections_back = std::vector<std::shared_ptr<connection::Connection>>();
+    this->connections_forward = std::vector<connection::Connection*>();
+    this->connections_back = std::vector<connection::Connection*>();
 }
 
 double Neuron::calculate()
@@ -105,6 +118,9 @@ double Neuron::activate(double value)
 
         case neuron::Activation::Sigmoid:
             return 1 / (1 + exp(-value));
+
+        case neuron::Activation::Binary:
+            return (double)value == 1;
         
         default:
             return 0;
@@ -116,12 +132,68 @@ double Neuron::calculateSum()
     double value_cache = 0;
 
     // calculate the sum
-    for (std::shared_ptr<connection::Connection> connection : this->connections_back)
+    for (connection::Connection* connection : this->connections_back)
     {
-       value_cache += connection->in->value * connection->weight;
+        if(connection->enabled)
+        {
+            value_cache += connection->in->value * connection->weight;
+        }
     }
 
     value_cache += this->bias;
 
     return value_cache;
+}
+
+double Neuron::recursiveCalculate()
+{
+    // proceed further at any other neuron
+    if (this->type != neuron::NeuronType::Input)
+    {
+
+        // check if the neuron has a cache
+        if (this->rewriteCache != nullptr)
+        {
+
+            // calculate if the neuron has to cache
+            if (*this->rewriteCache == true)
+            {
+                this->value = 0;
+
+                // calculate the sum
+                for (connection::Connection* connection : this->connections_back)
+                {
+                    if (connection->enabled)
+                    {
+                        this->value += connection->in->recursiveCalculate() * connection->weight;
+                    }
+                }
+
+                this->value += this->bias;
+
+                this->value = this->activate(this->value);
+            }
+        }
+
+        // calculate when there is no cache
+        else
+        {
+            this->value = 0;
+
+            // calculate the sum
+            for (connection::Connection* connection : this->connections_back)
+            {
+                if (connection->enabled)
+                {
+                    this->value += connection->in->recursiveCalculate() * connection->weight;
+                }
+            }
+
+            this->value += this->bias;
+
+            this->value = this->activate(this->value);
+        }
+    }
+
+    return this->value;
 }

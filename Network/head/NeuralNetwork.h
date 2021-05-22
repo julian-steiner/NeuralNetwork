@@ -11,6 +11,7 @@ namespace nn
 
     class NeuralNetwork : public NetworkBuffer
     {
+        public:
         std::vector<double> predict(std::vector<double> inputs);
         std::vector<double> train(std::vector<std::vector<double>> inputs, int cycles, nn::optimizers optimizer);
     };

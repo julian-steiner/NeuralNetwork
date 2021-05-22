@@ -6,21 +6,31 @@ NetworkBuffer::NetworkBuffer()
 {
     previousLayerSize = 0;
     inputLayerSize = 0;
-    this->connections = std::vector<std::shared_ptr<connection::Connection>>();
-    this->neurons = std::vector<std::shared_ptr<neuron::Neuron>>();
+    this->connections = std::vector<connection::Connection>();
+    this->neurons = std::vector<neuron::Neuron>();
 }
 
-void NetworkBuffer::addConnection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuron::Neuron> out)
+void NetworkBuffer::addConnection(neuron::Neuron* in, neuron::Neuron* out)
 {
-    this->connections.push_back(std::make_shared<connection::Connection>(connection::Connection(in, out)));
+    this->connections.push_back(connection::Connection(in, out));
 }
 
-void NetworkBuffer::addConnection(std::shared_ptr<neuron::Neuron> in, std::shared_ptr<neuron::Neuron> out, int innovationNumber)
+void NetworkBuffer::addConnection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber)
 {
-    this->connections.push_back(std::make_shared<connection::Connection>(connection::Connection(in, out, innovationNumber)));
+    this->connections.push_back(connection::Connection(in, out, innovationNumber));
 }
 
-void NetworkBuffer::addNeuron(std::shared_ptr<neuron::Neuron> neuron)
+void NetworkBuffer::connect(int inNeuronNumber, int outNeuronNumber)
+{
+    this->connections.push_back(connection::Connection(&this->neurons.at(inNeuronNumber-1), &this->neurons.at(outNeuronNumber-1)));
+}
+
+void NetworkBuffer::addNeuron(neuron::NeuronType type, neuron::Activation activation)
+{
+    this->neurons.push_back(neuron::Neuron(type, activation));
+}
+
+void NetworkBuffer::addNeuron(neuron::Neuron&& neuron)
 {
     this->neurons.push_back(neuron);
 }
@@ -46,7 +56,7 @@ void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, Laye
 
     for(int i = 0; i < numNeurons; i++)
     {
-        addNeuron(std::make_shared<neuron::Neuron>(neuron::Neuron(neuronType, activation)));
+        addNeuron(neuronType, activation);
     }
 
     //Connecting the layer if it should be
@@ -62,7 +72,7 @@ void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, Laye
                 {
                     for(int a = currentNetworkSize - this->previousLayerSize; a < currentNetworkSize; a++)
                     {
-                        addConnection(this->neurons.at(a), this->neurons.at(i));
+                        addConnection(&this->neurons.at(a), &this->neurons.at(i));
                     }
                 }
             }
