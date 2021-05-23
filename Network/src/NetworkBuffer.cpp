@@ -6,33 +6,46 @@ NetworkBuffer::NetworkBuffer()
 {
     previousLayerSize = 0;
     inputLayerSize = 0;
-    this->connections = std::vector<connection::Connection>();
-    this->neurons = std::vector<neuron::Neuron>();
+    this->connections = std::vector<connection::Connection*>();
+    this->neurons = std::vector<neuron::Neuron*>();
+}
+
+NetworkBuffer::~NetworkBuffer()
+{
+    for (connection::Connection* c_connection : this->connections)
+    {
+        delete c_connection;
+    }
+
+    for (neuron::Neuron* c_neuron : this->neurons)
+    {
+        delete c_neuron;
+    }
 }
 
 void NetworkBuffer::addConnection(neuron::Neuron* in, neuron::Neuron* out)
 {
-    this->connections.push_back(connection::Connection(in, out));
+    this->connections.push_back(new connection::Connection(in, out));
 }
 
 void NetworkBuffer::addConnection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber)
 {
-    this->connections.push_back(connection::Connection(in, out, innovationNumber));
+    this->connections.push_back(new connection::Connection(in, out, innovationNumber));
 }
 
 void NetworkBuffer::connect(int inNeuronNumber, int outNeuronNumber)
 {
-    this->connections.push_back(connection::Connection(&this->neurons.at(inNeuronNumber-1), &this->neurons.at(outNeuronNumber-1)));
+    this->connections.push_back(new connection::Connection(this->neurons.at(inNeuronNumber-1), this->neurons.at(outNeuronNumber-1)));
 }
 
 void NetworkBuffer::addNeuron(neuron::NeuronType type, neuron::Activation activation)
 {
-    this->neurons.push_back(neuron::Neuron(type, activation));
+    this->neurons.push_back(new neuron::Neuron(type, activation));
 }
 
 void NetworkBuffer::addNeuron(neuron::Neuron&& neuron)
 {
-    this->neurons.push_back(neuron);
+    this->neurons.push_back(&neuron);
 }
 
 void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, LayerType type)
@@ -72,7 +85,7 @@ void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, Laye
                 {
                     for(int a = currentNetworkSize - this->previousLayerSize; a < currentNetworkSize; a++)
                     {
-                        addConnection(&this->neurons.at(a), &this->neurons.at(i));
+                        addConnection(this->neurons.at(a), this->neurons.at(i));
                     }
                 }
             }

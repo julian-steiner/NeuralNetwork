@@ -9,7 +9,7 @@ Connection::Connection(neuron::Neuron* in, neuron::Neuron* out)
     this->in = in;
     this->out = out;
     this->innovationNumber = 0;
-    this->weight = std::rand() / RAND_MAX * 2 - 1;
+    this->weight = (double)std::rand() / (double)RAND_MAX * 2 - 1;
     this->isConnected = false;
     this->configureConnectedNeurons();
 }
@@ -20,7 +20,7 @@ Connection::Connection(neuron::Neuron* in, neuron::Neuron* out, int innovationNu
     this->in = in;
     this->out = out;
     this->innovationNumber = innovationNumber;
-    this->weight = std::rand() / RAND_MAX * 2 - 1;
+    this->weight = (double)std::rand() / (double)RAND_MAX * 2 - 1;
     this->isConnected = false;
     this->configureConnectedNeurons();
 }
@@ -31,7 +31,7 @@ Connection::Connection(neuron::Neuron* in, neuron::Neuron* out, int inNeuronNumb
     this->in = in;
     this->out = out;
     this->innovationNumber = 0;
-    this->weight = std::rand() / RAND_MAX * 2 - 1;
+    this->weight = (double)std::rand() / (double)RAND_MAX * 2 - 1;
     this->isConnected = false;
     this->inNeuronNumber = inNeuronNumber;
     this->outNeuronNumber = outNeuronNumber;
@@ -125,6 +125,7 @@ double Neuron::activate(double value)
         default:
             return 0;
     }
+
 }
 
 double Neuron::calculateSum()
@@ -150,7 +151,6 @@ double Neuron::recursiveCalculate()
     // proceed further at any other neuron
     if (this->type != neuron::NeuronType::Input)
     {
-
         // check if the neuron has a cache
         if (this->rewriteCache != nullptr)
         {
@@ -172,6 +172,8 @@ double Neuron::recursiveCalculate()
                 this->value += this->bias;
 
                 this->value = this->activate(this->value);
+
+                this->rewriteCache = std::make_shared<bool>(false);
             }
         }
 

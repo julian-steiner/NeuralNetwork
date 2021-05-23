@@ -95,6 +95,8 @@
         "cstdarg": "cpp",
         "cwctype": "cpp",
         "memory_resource": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "numeric": "cpp",
+        "random": "cpp"
     }
 }

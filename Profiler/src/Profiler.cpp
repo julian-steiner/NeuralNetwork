@@ -1,4 +1,4 @@
-#include "Timer.h"
+#include "Profiler.h"
 
 using namespace profiling;
 
@@ -12,8 +12,8 @@ InstrumentationTimer::~InstrumentationTimer()
 {
     endTime = std::chrono::high_resolution_clock::now();
 
-    auto start = std::chrono::time_point_cast<std::chrono::nanoseconds>(startTime).time_since_epoch().count();
-    auto end = std::chrono::time_point_cast<std::chrono::nanoseconds>(endTime).time_since_epoch().count();
+    auto start = std::chrono::time_point_cast<std::chrono::microseconds>(startTime).time_since_epoch().count();
+    auto end = std::chrono::time_point_cast<std::chrono::microseconds>(endTime).time_since_epoch().count();
 
     Instrumentor::Get().WriteProfile({m_Name, start, end});
 }

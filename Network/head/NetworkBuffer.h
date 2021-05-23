@@ -14,10 +14,11 @@ namespace nn
     {
         int previousLayerSize;
         int inputLayerSize;
-        std::vector<neuron::Neuron> neurons;
-        std::vector<connection::Connection> connections;
+        std::vector<neuron::Neuron*> neurons;
+        std::vector<connection::Connection*> connections;
 
         NetworkBuffer();
+        ~NetworkBuffer();
 
         void addConnection(neuron::Neuron* in, neuron::Neuron* out);
         void addConnection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber);

@@ -6,12 +6,13 @@ enable_testing()
 
 add_subdirectory(googletest)
 
-include_directories(Neuron/head Network/head Timer/head googletest/include)
+include_directories(Neuron/head Network/head Profiler/head googletest/include)
 
 add_definitions(-DPROFILING)
 
-set(TimerSources
-    Timer/src/Timer.cpp
+set(ProfilerSources
+    Profiler/src/Profiler.cpp
+    Profiler/src/Timer.cpp
 )
 
 set(NetworkSources
@@ -29,17 +30,17 @@ set(BenchmarkingSources
     Benchmarking/NetworkBenchmark.cpp
 )
 
-add_library(Timer ${TimerSources})
+add_library(Profiler ${ProfilerSources})
 
 add_library(NeuralNetwork ${NetworkSources})
 
 add_executable(NeuralNetworkTest ${TestingSources})
 target_link_libraries(NeuralNetworkTest PUBLIC gtest_main)
 target_link_libraries(NeuralNetworkTest PUBLIC NeuralNetwork)
-target_link_libraries(NeuralNetworkTest PUBLIC Timer)
+target_link_libraries(NeuralNetworkTest PUBLIC Profiler)
 
 add_executable(NetworkBenchmark ${BenchmarkingSources})
 target_link_libraries(NetworkBenchmark PUBLIC NeuralNetwork)
-target_link_libraries(NetworkBenchmark PUBLIC Timer)
+target_link_libraries(NetworkBenchmark PUBLIC Profiler)
 
 add_test(Test Test)

@@ -1,4 +1,5 @@
 #include "NeuralNetwork.h"
+#include "Profiler.h"
 
 std::vector<double> nn::NeuralNetwork::predict(std::vector<double> inputs)
 {
@@ -10,15 +11,15 @@ std::vector<double> nn::NeuralNetwork::predict(std::vector<double> inputs)
     }
 
     // reset the cache on the neurons 
-    for (neuron::Neuron c_neuron: this->neurons)
+    for (neuron::Neuron* c_neuron: this->neurons)
     {
-        c_neuron.rewriteCache = std::make_shared<bool>(true);
+        c_neuron->rewriteCache = std::make_shared<bool>(true);
     }
 
     // set the values on the input neurons
     for (int i = 0; i < this->inputLayerSize; i++)
     {
-        this->neurons.at(i).value = inputs.at(i);
+        this->neurons.at(i)->value = inputs.at(i);
     }
 
     // create the result vector
@@ -29,7 +30,7 @@ std::vector<double> nn::NeuralNetwork::predict(std::vector<double> inputs)
     int a = this->neurons.size() - this->previousLayerSize;
     for (int i = this->neurons.size() - this->previousLayerSize; i < this->neurons.size(); i++)
     {
-        result.push_back(this->neurons.at(i).recursiveCalculate());
+        result.push_back(this->neurons.at(i)->recursiveCalculate());
     }
 
     return result;
