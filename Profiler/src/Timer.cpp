@@ -1,14 +1,14 @@
 #include "Timer.h"
 
-using namespace profiling;
+using namespace timing;
 
-Scope_Timer::Scope_Timer(const char* name) 
+ScopeTimer::ScopeTimer(const char* name) 
 {
     this->start_time = std::chrono::high_resolution_clock::now();
     this->name = name;
 }
 
-Scope_Timer::~Scope_Timer()
+ScopeTimer::~ScopeTimer()
 {
     this->end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time);

@@ -52,20 +52,16 @@ void Connection::configureConnectedNeurons()
     }
 }
 
-Neuron::Neuron(NeuronType type, Activation activation, bool has_cache)
+Neuron::Neuron(NeuronType type, Activation activation, bool hasCache)
 {
     this->value = 0;
     this->bias = 0;
     this->type = type;
+    this->hasCache = hasCache;
 
-    if (has_cache)
+    if (hasCache)
     {
-        this->rewriteCache = std::make_shared<bool>(true);
-    }
-
-    else
-    {
-        this->rewriteCache = nullptr;
+        this->rewriteCache = true;
     }
 
     this->activation = activation;
@@ -79,10 +75,10 @@ double Neuron::calculate()
     if (this->type != NeuronType::Input)
     {
         // compute if rewriteCache is set
-        if (this->rewriteCache != nullptr)
+        if (this->hasCache)
         {
             // compute if rewriteCache is true
-            if (*this->rewriteCache == true)
+            if (this->rewriteCache == true)
             {
                 // reset the storages
                 this->weightedSumCache = 0; 
@@ -94,6 +90,8 @@ double Neuron::calculate()
 
                 // activate the sum
                 this->value = this->activate(this->value);
+
+                this->rewriteCache = false;
             }
         }
 
@@ -152,11 +150,11 @@ double Neuron::recursiveCalculate()
     if (this->type != neuron::NeuronType::Input)
     {
         // check if the neuron has a cache
-        if (this->rewriteCache != nullptr)
+        if (this->hasCache)
         {
 
             // calculate if the neuron has to cache
-            if (*this->rewriteCache == true)
+            if (this->rewriteCache == true)
             {
                 this->value = 0;
 
@@ -173,7 +171,7 @@ double Neuron::recursiveCalculate()
 
                 this->value = this->activate(this->value);
 
-                this->rewriteCache = std::make_shared<bool>(false);
+                this->rewriteCache = false;
             }
         }
 

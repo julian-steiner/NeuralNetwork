@@ -14,8 +14,10 @@ namespace nn
     {
         int previousLayerSize;
         int inputLayerSize;
+        int currentLayerNumber;
         std::vector<neuron::Neuron*> neurons;
         std::vector<connection::Connection*> connections;
+        std::vector<std::vector<neuron::Neuron*>> layers;
 
         NetworkBuffer();
         ~NetworkBuffer();
@@ -29,6 +31,9 @@ namespace nn
 
         //TODO: Fix the bug that addLayer changes the pointers
         void addLayer(int numNeurons, neuron::Activation activation, LayerType type);
+
+        private:
+        void addNeuron(neuron::NeuronType type, neuron::Activation activation, int layerNumber);
     };
 }
 

@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include "NetworkBuffer.h"
+#include <future>
 
 namespace nn
 {
@@ -14,6 +15,9 @@ namespace nn
         public:
         std::vector<double> predict(std::vector<double> inputs);
         std::vector<double> train(std::vector<std::vector<double>> inputs, int cycles, nn::optimizers optimizer);
+
+        private:
+        static void calculateNeuron(neuron::Neuron* neuron);
     };
 }
 

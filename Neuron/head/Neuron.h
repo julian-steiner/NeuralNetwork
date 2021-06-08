@@ -25,7 +25,8 @@ namespace neuron
         double value;
         double bias;
 
-        std::shared_ptr<bool> rewriteCache;
+        bool rewriteCache;
+        bool hasCache;
         double weightedSumCache;
 
         std::vector<connection::Connection*> connections_forward;

@@ -6,9 +6,9 @@
 
 #define TIME_SCOPE(name) profiling::Scope_Timer(name);
 
-namespace profiling
+namespace timing
 {
-    class Scope_Timer
+    class ScopeTimer
     {
         private:
         const char* name;
@@ -16,8 +16,8 @@ namespace profiling
         std::chrono::time_point<std::chrono::high_resolution_clock> end_time;
 
         public:
-        Scope_Timer(const char* name);
-        ~Scope_Timer();
+        ScopeTimer(const char* name);
+        ~ScopeTimer();
     };
 }
 

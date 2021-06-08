@@ -78,7 +78,7 @@ TEST(Neuron, ComputingCorrectlyWithoutRefreshingCache)
     neuron::Neuron testNeuron3 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, false);
     testNeuron3.bias = 1;
 
-    testNeuron3.rewriteCache = std::make_shared<bool>(false);
+    testNeuron3.rewriteCache = false;
     testNeuron3.value = 12039;
 
     connection::Connection connection1 = connection::Connection(&testNeuron, &testNeuron3);
@@ -100,7 +100,7 @@ TEST(Neuron, ComputingCorrectlyWithRefreshingCache)
     neuron::Neuron testNeuron3 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, false);
     testNeuron3.bias = 1;
 
-    testNeuron3.rewriteCache = std::make_shared<bool>(true);
+    testNeuron3.rewriteCache = true;
     testNeuron3.value = 12039;
 
     connection::Connection connection1 = connection::Connection(&testNeuron, &testNeuron3);

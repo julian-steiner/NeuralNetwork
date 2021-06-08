@@ -6,8 +6,10 @@ NetworkBuffer::NetworkBuffer()
 {
     previousLayerSize = 0;
     inputLayerSize = 0;
+    currentLayerNumber = 0;
     this->connections = std::vector<connection::Connection*>();
     this->neurons = std::vector<neuron::Neuron*>();
+    this->layers = std::vector<std::vector<neuron::Neuron*>>();
 }
 
 NetworkBuffer::~NetworkBuffer()
@@ -40,12 +42,19 @@ void NetworkBuffer::connect(int inNeuronNumber, int outNeuronNumber)
 
 void NetworkBuffer::addNeuron(neuron::NeuronType type, neuron::Activation activation)
 {
-    this->neurons.push_back(new neuron::Neuron(type, activation));
+    this->neurons.push_back(new neuron::Neuron(type, activation, true));
 }
 
 void NetworkBuffer::addNeuron(neuron::Neuron&& neuron)
 {
     this->neurons.push_back(&neuron);
+}
+
+void NetworkBuffer::addNeuron(neuron::NeuronType type, neuron::Activation activation, int layerNumber)
+{
+    neuron::Neuron* neuronPtr = new neuron::Neuron(type, activation, true);
+    this->neurons.push_back(neuronPtr);
+    this->layers.at(layerNumber).push_back(neuronPtr);
 }
 
 void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, LayerType type)
@@ -59,6 +68,10 @@ void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, Laye
     //Reserve the space in the Neurons Vector to minimize copying
     this->neurons.reserve(this->neurons.size() + numNeurons);
 
+    //Add and reserve space in the layers vector
+    this->layers.emplace_back(std::vector<neuron::Neuron*>());
+    this->layers.at(currentLayerNumber).reserve(numNeurons);
+
     if (currentNetworkSize == 0)
     {
         neuronType = neuron::NeuronType::Input;
@@ -69,7 +82,7 @@ void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, Laye
 
     for(int i = 0; i < numNeurons; i++)
     {
-        addNeuron(neuronType, activation);
+        addNeuron(neuronType, activation, currentLayerNumber);
     }
 
     //Connecting the layer if it should be
@@ -91,4 +104,5 @@ void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, Laye
             }
     }
     this->previousLayerSize = numNeurons;
+    this->currentLayerNumber ++;
 }
