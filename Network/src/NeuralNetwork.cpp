@@ -15,13 +15,10 @@ std::vector<double> nn::NeuralNetwork::predict(std::vector<double> inputs)
         throw ("Input vector has to be the same size as the input Layer");
     }
 
+    // reset the cache on the neurons 
+    for (neuron::Neuron* c_neuron: this->neurons)
     {
-        PROFILE_SCOPE("Reset Cache Variable set");
-        // reset the cache on the neurons 
-        for (neuron::Neuron* c_neuron: this->neurons)
-        {
-            c_neuron->rewriteCache = true;
-        }
+        c_neuron->rewriteCache = true;
     }
 
     // set the values on the input neurons
@@ -38,7 +35,6 @@ std::vector<double> nn::NeuralNetwork::predict(std::vector<double> inputs)
     int a = this->neurons.size() - this->previousLayerSize;
     for (int i = this->neurons.size() - this->previousLayerSize; i < this->neurons.size(); i++)
     {
-        PROFILE_SCOPE("Recursive Calculate");
         result.push_back(this->neurons.at(i)->recursiveCalculate());
     }
 

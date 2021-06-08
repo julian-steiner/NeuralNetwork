@@ -17,7 +17,7 @@ int main()
 
         {
             PROFILE_SCOPE("CreateNetwork");
-            for (int i = 0; i < 21; i++)
+            for (int i = 0; i < 1; i++)
             {
                 network.addLayer(284, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
             }
@@ -40,7 +40,6 @@ int main()
 
         {
             PROFILE_SCOPE("FeedForward");
-            profiling::Scope_Timer a("Hello");
             results = network.predict(inputs);
         }
 

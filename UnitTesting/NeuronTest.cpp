@@ -75,7 +75,7 @@ TEST(Neuron, ComputingCorrectlyWithoutRefreshingCache)
     neuron::Neuron testNeuron2 = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid);
     testNeuron2.value = 100;
 
-    neuron::Neuron testNeuron3 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, false);
+    neuron::Neuron testNeuron3 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, true);
     testNeuron3.bias = 1;
 
     testNeuron3.rewriteCache = false;
@@ -97,7 +97,7 @@ TEST(Neuron, ComputingCorrectlyWithRefreshingCache)
     neuron::Neuron testNeuron2 = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid);
     testNeuron2.value = 100;
 
-    neuron::Neuron testNeuron3 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, false);
+    neuron::Neuron testNeuron3 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, true);
     testNeuron3.bias = 1;
 
     testNeuron3.rewriteCache = true;
