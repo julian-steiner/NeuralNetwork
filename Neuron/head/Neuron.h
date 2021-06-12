@@ -45,7 +45,7 @@ namespace neuron
 
 namespace connection
 {
-    struct Connection : public std::enable_shared_from_this<connection::Connection>
+    struct Connection
     {
         neuron::Neuron* in;
         neuron::Neuron* out;
@@ -61,6 +61,12 @@ namespace connection
         Connection(neuron::Neuron* in, neuron::Neuron* out, int inNeuronNumber, int outNeuronNumber);
 
         void configureConnectedNeurons();
+    };
+
+    struct ConnectionDummy
+    {
+        int inNeuronNumber;
+        int outNeuronNumber;
     };
 }
 

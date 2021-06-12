@@ -15,6 +15,7 @@ namespace nn
         public:
         std::vector<double> predict(std::vector<double> inputs);
         std::vector<double> train(std::vector<std::vector<double>> inputs, int cycles, nn::optimizers optimizer);
+        nn::NeuralNetwork getCopy();
 
         private:
         static void calculateNeuron(neuron::Neuron* neuron);

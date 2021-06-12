@@ -6,7 +6,7 @@ enable_testing()
 
 add_subdirectory(googletest)
 
-include_directories(Neuron/head Network/head Profiler/head googletest/include)
+include_directories(Neuron/head Network/head Population/head Profiler/head googletest/include)
 
 add_definitions(-DPROFILING)
 
@@ -19,6 +19,7 @@ set(NetworkSources
     Neuron/src/Neuron.cpp
     Network/src/NetworkBuffer.cpp
     Network/src/NeuralNetwork.cpp
+    Population/src/Population.cpp
 )
 
 set(TestingSources
