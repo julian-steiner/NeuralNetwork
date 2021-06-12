@@ -19,6 +19,7 @@ set(NetworkSources
     Neuron/src/Neuron.cpp
     Network/src/NetworkBuffer.cpp
     Network/src/NeuralNetwork.cpp
+    Network/src/Layer.cpp
     Population/src/Population.cpp
 )
 

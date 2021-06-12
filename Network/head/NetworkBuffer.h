@@ -3,37 +3,39 @@
 
 #include <vector>
 #include <memory>
+#include "Layer.h"
 #include "../../Neuron/head/Neuron.h"
 
 namespace nn
 {
 
-    enum LayerType {FullyConnected};
+    enum LayerType : unsigned int {Input, Output, Hidden, CustomConnectedHidden};
+    enum LayerConnectionType : unsigned int {FullyConnected};
 
     struct NetworkBuffer
     {
         int previousLayerSize;
-        int inputLayerSize;
+
+        nn::InputLayer* inputLayer;
+        nn::OutputLayer* outputLayer;
+
         int currentLayerNumber;
         std::vector<neuron::Neuron*> neurons;
         std::vector<connection::Connection*> connections;
-        std::vector<std::vector<neuron::Neuron*>> layers;
+        std::vector<nn::Layer*> layers;
 
         NetworkBuffer();
         ~NetworkBuffer();
 
         void addConnection(neuron::Neuron* in, neuron::Neuron* out);
         void addConnection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber);
-        void addNeuron(neuron::Neuron&& neuron);
-
-        void addNeuron(neuron::NeuronType type, neuron::Activation activation);
+        void addNeuron(neuron::Neuron&& neuron, int layerNumber);
+        void addNeuron(neuron::NeuronType type, neuron::Activation activation, int layerNumber);
         void connect(int inNeuronNumber, int outNeuronNumber);
 
-        //TODO: Fix the bug that addLayer changes the pointers
-        void addLayer(int numNeurons, neuron::Activation activation, LayerType type);
+        void addLayer(int numNeurons, neuron::Activation activation, LayerType layerType, LayerConnectionType connectionType);
 
-        private:
-        void addNeuron(neuron::NeuronType type, neuron::Activation activation, int layerNumber);
+        nn::NetworkBuffer getCopy();
     };
 }
 

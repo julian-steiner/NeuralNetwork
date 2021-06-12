@@ -14,7 +14,8 @@ TEST(NetworkBuffer, NeuronCorrectlyAdded)
 {
     nn::NetworkBuffer testNetwork;
 
-    testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid);
+    testNetwork.addLayer(0, neuron::Activation::None, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, 0);
 
     ASSERT_EQ(testNetwork.neurons.size(), 1);
 }
@@ -23,8 +24,9 @@ TEST(NetworkBuffer, ConnectionCorrectlyAdded)
 {
     nn::NetworkBuffer testNetwork;
 
-    testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid);
-    testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid);
+    testNetwork.addLayer(0, neuron::Activation::None, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, 0);
+    testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, 0);
     testNetwork.connect(1, 2);
 
     ASSERT_EQ(testNetwork.neurons.size(), 2);
@@ -34,8 +36,9 @@ TEST(NetworkBuffer, ConnectionCorrectlyAdded)
 TEST(NetworkBuffer, ConnectingWorkingCorrectly)
 {
     nn::NetworkBuffer testNetwork;
-    testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid);
-    testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::None);
+    testNetwork.addLayer(0, neuron::Activation::None, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, 0);
+    testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::None, 0);
     
     testNetwork.connect(1, 2);
 
@@ -49,11 +52,11 @@ TEST(NetworkBuffer, LayersCorrectlyAdded)
 {
     nn::NetworkBuffer testNetwork;
 
-    testNetwork.addLayer(10, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
-    testNetwork.addLayer(20, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
-    testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
+    testNetwork.addLayer(10, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(20, neuron::Activation::Sigmoid, nn::LayerType::Hidden, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
 
-    ASSERT_EQ(testNetwork.inputLayerSize, 10);
+    ASSERT_EQ(testNetwork.inputLayer->size, 10);
     ASSERT_EQ(testNetwork.neurons.size(), 32);
     ASSERT_EQ(testNetwork.previousLayerSize, 2);
     ASSERT_EQ(testNetwork.neurons.at(5)->type, neuron::NeuronType::Input);
@@ -64,9 +67,9 @@ TEST(NetworkBuffer, ConnectionsCorrectlyAdded)
 {
     nn::NetworkBuffer testNetwork;
 
-    testNetwork.addLayer(10, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
-    testNetwork.addLayer(20, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
-    testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
+    testNetwork.addLayer(10, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(20, neuron::Activation::Sigmoid, nn::LayerType::Hidden, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
 
     ASSERT_EQ(testNetwork.neurons.at(0)->connections_forward.size(), 20);
     ASSERT_EQ(testNetwork.neurons.at(15)->connections_back.size(), 10);
@@ -77,9 +80,9 @@ TEST(NetworkBuffer, ConnectionsCorrectlyAdded)
 TEST(NeuralNetwork, NetworkInheritanceWorkingCorrectly)
 {
     nn::NeuralNetwork testNetwork; 
-    testNetwork.addLayer(10, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
-    testNetwork.addLayer(20, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
-    testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
+    testNetwork.addLayer(10, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(20, neuron::Activation::Sigmoid, nn::LayerType::Hidden, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
 
     ASSERT_EQ(testNetwork.neurons.at(0)->connections_forward.size(), 20);
     ASSERT_EQ(testNetwork.neurons.at(15)->connections_back.size(), 10);
@@ -90,9 +93,9 @@ TEST(NeuralNetwork, NetworkInheritanceWorkingCorrectly)
 TEST(NeuralNetwork, FeedforwardWorkingCorrectly)
 {
     nn::NeuralNetwork testNetwork;
-    testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::FullyConnected);
-    testNetwork.addLayer(2, neuron::Activation::Binary, nn::LayerType::FullyConnected);
-    testNetwork.addLayer(1, neuron::Activation::Binary, nn::LayerType::FullyConnected);
+    testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(2, neuron::Activation::Binary, nn::LayerType::Hidden, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(1, neuron::Activation::Binary, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
     
     testNetwork.connections.at(0)->weight = 1;
     testNetwork.connections.at(1)->weight = 1;

@@ -69,6 +69,23 @@ Neuron::Neuron(NeuronType type, Activation activation, bool hasCache)
     this->connections_back = std::vector<connection::Connection*>();
 }
 
+Neuron::Neuron(NeuronType type, Activation activation, double bias, bool rewriteCache, bool hasCache)
+{
+    this->value = 0;
+    this->bias = bias;
+    this->type = type;
+    this->hasCache = hasCache;
+
+    if (hasCache)
+    {
+        this->rewriteCache = true;
+    }
+
+    this->activation = activation;
+    this->connections_forward = std::vector<connection::Connection*>();
+    this->connections_back = std::vector<connection::Connection*>();
+}
+
 double Neuron::calculate()
 {
     // skip computation if the neuron is input
