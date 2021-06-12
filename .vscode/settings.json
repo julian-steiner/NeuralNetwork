@@ -97,6 +97,12 @@
         "memory_resource": "cpp",
         "string_view": "cpp",
         "numeric": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "condition_variable": "cpp",
+        "coroutine": "cpp",
+        "resumable": "cpp",
+        "future": "cpp",
+        "mutex": "cpp",
+        "thread": "cpp"
     }
 }

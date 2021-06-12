@@ -5,11 +5,10 @@ using namespace nn;
 NetworkBuffer::NetworkBuffer()
 {
     previousLayerSize = 0;
-    inputLayerSize = 0;
     currentLayerNumber = 0;
     this->connections = std::vector<connection::Connection*>();
     this->neurons = std::vector<neuron::Neuron*>();
-    this->layers = std::vector<std::vector<neuron::Neuron*>>();
+    this->layers = std::vector<nn::Layer*>();
 }
 
 NetworkBuffer::~NetworkBuffer()
@@ -22,6 +21,11 @@ NetworkBuffer::~NetworkBuffer()
     for (neuron::Neuron* c_neuron : this->neurons)
     {
         delete c_neuron;
+    }
+
+    for (nn::Layer* c_layer : this->layers)
+    {
+        delete c_layer;
     }
 }
 
@@ -54,10 +58,10 @@ void NetworkBuffer::addNeuron(neuron::NeuronType type, neuron::Activation activa
 {
     neuron::Neuron* neuronPtr = new neuron::Neuron(type, activation, true);
     this->neurons.push_back(neuronPtr);
-    this->layers.at(layerNumber).push_back(neuronPtr);
+    this->layers.at(layerNumber)->neurons.push_back(neuronPtr);
 }
 
-void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, LayerType type)
+void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, LayerType layerType, LayerConnectionType layerConnectionType)
 {
     //Determining the layerType out of the network size
     //If the Network size is 0 then the layer has to be input
@@ -68,15 +72,33 @@ void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, Laye
     //Reserve the space in the Neurons Vector to minimize copying
     this->neurons.reserve(this->neurons.size() + numNeurons);
 
-    //Add and reserve space in the layers vector
-    this->layers.emplace_back(std::vector<neuron::Neuron*>());
-    this->layers.at(currentLayerNumber).reserve(numNeurons);
-
     if (currentNetworkSize == 0)
     {
         neuronType = neuron::NeuronType::Input;
-        this->inputLayerSize = numNeurons;
+        layerType = LayerType::Input;
     }
+
+    //Add and reserve space in the layers vector
+    std::cout << layerType << std::endl;
+    switch (layerType)
+    {
+        case LayerType::Input:
+            this->layers.emplace_back(new InputLayer(numNeurons, activation, layerConnectionType));
+            this->inputLayer = (nn::InputLayer*) this->layers.at(currentLayerNumber);
+            break;
+        case LayerType::Output:
+            this->layers.emplace_back(new OutputLayer(numNeurons, activation, layerConnectionType));
+            this->outputLayer = (nn::OutputLayer*) this->layers.at(currentLayerNumber);
+            break;
+        case LayerType::Hidden:
+            this->layers.emplace_back(new HiddenLayer(numNeurons, activation, layerConnectionType));
+            break;
+        case LayerType::CustomConnectedHidden:
+            this->layers.emplace_back(new CustomConnectedHiddenLayer(numNeurons, activation, layerConnectionType));
+            break;
+    }
+
+    this->layers.at(currentLayerNumber)->neurons.reserve(numNeurons);
 
     //Adding the neurons to the network
 
@@ -86,9 +108,9 @@ void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, Laye
     }
 
     //Connecting the layer if it should be
-    switch (type)
+    switch (layerConnectionType)
     {
-        case LayerType::FullyConnected:
+        case LayerConnectionType::FullyConnected:
             if(neuronType != neuron::NeuronType::Input)
             {
                 //Reserving the space in the connections Vector
@@ -105,4 +127,16 @@ void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, Laye
     }
     this->previousLayerSize = numNeurons;
     this->currentLayerNumber ++;
+}
+
+nn::NetworkBuffer nn::NetworkBuffer::getCopy()
+{
+    nn::NetworkBuffer tempNetworkBuffer;
+
+    for (nn::Layer* currentLayer: this->layers)
+    {
+        tempNetworkBuffer.addLayer(currentLayer->size, currentLayer->activation, nn::LayerType::Hidden, currentLayer->layerType);
+    }
+
+    return tempNetworkBuffer;
 }

@@ -33,6 +33,7 @@ namespace neuron
         std::vector<connection::Connection*> connections_back;
 
         Neuron(NeuronType type, Activation activation, bool has_cache = false);
+        Neuron(NeuronType type, Activation activation, double bias, bool rewriteCache, bool hasCache);
 
         double calculate();
         double recursiveCalculate();
