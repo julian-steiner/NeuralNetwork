@@ -25,6 +25,7 @@ namespace neuron
         double value;
         double bias;
 
+        int layerNumber;
         bool rewriteCache;
         bool hasCache;
         double weightedSumCache;
@@ -32,8 +33,8 @@ namespace neuron
         std::vector<connection::Connection*> connections_forward;
         std::vector<connection::Connection*> connections_back;
 
-        Neuron(NeuronType type, Activation activation, bool has_cache = false);
-        Neuron(NeuronType type, Activation activation, double bias, bool rewriteCache, bool hasCache);
+        Neuron(NeuronType type, Activation activation, bool has_cache = false, int layerNumber=0);
+        Neuron(NeuronType type, Activation activation, double bias, bool rewriteCache, bool hasCache, int layerNumber=0);
 
         double calculate();
         double recursiveCalculate();
@@ -68,6 +69,8 @@ namespace connection
     {
         int inNeuronNumber;
         int outNeuronNumber;
+
+        ConnectionDummy(int inNeuronNumber, int outNeuronNumber);
     };
 }
 

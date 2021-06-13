@@ -29,29 +29,36 @@ NetworkBuffer::~NetworkBuffer()
     }
 }
 
-void NetworkBuffer::addConnection(neuron::Neuron* in, neuron::Neuron* out)
-{
-    this->connections.push_back(new connection::Connection(in, out));
-}
-
 void NetworkBuffer::addConnection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber)
 {
     this->connections.push_back(new connection::Connection(in, out, innovationNumber));
 }
 
-void NetworkBuffer::connect(int inNeuronNumber, int outNeuronNumber)
+void NetworkBuffer::connect(int inNeuronNumber, int outNeuronNumber, int innovationNumber)
 {
-    this->connections.push_back(new connection::Connection(this->neurons.at(inNeuronNumber-1), this->neurons.at(outNeuronNumber-1)));
+    neuron::Neuron* in = this->neurons.at(inNeuronNumber);
+    neuron::Neuron* out = this->neurons.at(outNeuronNumber);
+    addConnection(in, out, innovationNumber);
+
+    // Add the connection to the connectionDummies in the layer (only to the out to prevent redundancy)
+    this->layers.at(out->layerNumber)->connectionDummys.emplace_back(connection::ConnectionDummy(inNeuronNumber, outNeuronNumber));
 }
 
 void NetworkBuffer::addNeuron(neuron::NeuronType type, neuron::Activation activation, int layerNumber)
 {
-    this->neurons.push_back(new neuron::Neuron(type, activation, true));
+    this->neurons.push_back(new neuron::Neuron(type, activation, true, layerNumber));
+    this->layers.at(layerNumber)->neurons.push_back(this->neurons.back());
+}
+
+void NetworkBuffer::addNeuron(neuron::NeuronType type, neuron::Activation activation, int layerNumber, double bias)
+{
+    this->neurons.push_back(new neuron::Neuron(type, activation, bias, true, layerNumber));
     this->layers.at(layerNumber)->neurons.push_back(this->neurons.back());
 }
 
 void NetworkBuffer::addNeuron(neuron::Neuron&& neuron, int layerNumber)
 {
+    neuron.layerNumber = layerNumber;
     this->neurons.push_back(&neuron);
     this->layers.at(layerNumber)->neurons.push_back(this->neurons.back());
 }
@@ -75,7 +82,6 @@ void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, Laye
     }
 
     //Add and reserve space in the layers vector
-    std::cout << layerType << std::endl;
     switch (layerType)
     {
         case LayerType::Input:
@@ -116,7 +122,7 @@ void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, Laye
                 {
                     for(int a = currentNetworkSize - this->previousLayerSize; a < currentNetworkSize; a++)
                     {
-                        addConnection(this->neurons.at(a), this->neurons.at(i));
+                        connect(a, i);
                     }
                 }
             }
@@ -129,9 +135,46 @@ nn::NetworkBuffer nn::NetworkBuffer::getCopy()
 {
     nn::NetworkBuffer tempNetworkBuffer;
 
-    for (nn::Layer* currentLayer: this->layers)
+    // Add every layer
+    for (nn::Layer* currentLayer : this->layers)
     {
-        tempNetworkBuffer.addLayer(currentLayer->size, currentLayer->activation, nn::LayerType::Hidden, currentLayer->layerType);
+        // Add the layers
+        switch(currentLayer->layerType)
+        {
+            case(nn::LayerType::Input):
+                tempNetworkBuffer.layers.emplace_back(new nn::InputLayer(currentLayer->getSize(), currentLayer->activation, currentLayer->layerConnectionType));
+                tempNetworkBuffer.inputLayer = (nn::InputLayer*)tempNetworkBuffer.layers.back();
+                break;
+
+            case(nn::LayerType::Output):
+                tempNetworkBuffer.layers.emplace_back(new nn::OutputLayer(currentLayer->getSize(), currentLayer->activation, currentLayer->layerConnectionType));
+                tempNetworkBuffer.outputLayer = (nn::OutputLayer*)tempNetworkBuffer.layers.back();
+                break;
+
+            case(nn::LayerType::Hidden):
+                tempNetworkBuffer.layers.emplace_back(new nn::HiddenLayer(currentLayer->getSize(), currentLayer->activation, currentLayer->layerConnectionType));
+                break;
+
+            case(nn::LayerType::CustomConnectedHidden):
+                tempNetworkBuffer.layers.emplace_back(new nn::CustomConnectedHiddenLayer(currentLayer->getSize(), currentLayer->activation, currentLayer->layerConnectionType));
+                break;
+        }
+
+        // Add the neurons
+        for (neuron::Neuron* currentNeuron : currentLayer->neurons)
+        {
+            tempNetworkBuffer.addNeuron(currentNeuron->type, currentNeuron->activation, currentNeuron->layerNumber, currentNeuron->bias);
+        }
+    }
+
+    // Add the connections (here because otherwise you get nullptrs)
+    for (nn::Layer* currentLayer : this->layers)
+    {
+        // Add the connections
+        for (connection::ConnectionDummy currentConnectionDummy : currentLayer->connectionDummys)
+        {
+            tempNetworkBuffer.connect(currentConnectionDummy.inNeuronNumber, currentConnectionDummy.outNeuronNumber);
+        }
     }
 
     return tempNetworkBuffer;

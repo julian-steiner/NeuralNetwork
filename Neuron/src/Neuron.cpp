@@ -52,7 +52,7 @@ void Connection::configureConnectedNeurons()
     }
 }
 
-Neuron::Neuron(NeuronType type, Activation activation, bool hasCache)
+Neuron::Neuron(NeuronType type, Activation activation, bool hasCache, int layerNumber)
 {
     this->value = 0;
     this->bias = 0;
@@ -65,11 +65,12 @@ Neuron::Neuron(NeuronType type, Activation activation, bool hasCache)
     }
 
     this->activation = activation;
+    this->layerNumber = layerNumber;
     this->connections_forward = std::vector<connection::Connection*>();
     this->connections_back = std::vector<connection::Connection*>();
 }
 
-Neuron::Neuron(NeuronType type, Activation activation, double bias, bool rewriteCache, bool hasCache)
+Neuron::Neuron(NeuronType type, Activation activation, double bias, bool rewriteCache, bool hasCache, int layerNumber)
 {
     this->value = 0;
     this->bias = bias;
@@ -82,6 +83,7 @@ Neuron::Neuron(NeuronType type, Activation activation, double bias, bool rewrite
     }
 
     this->activation = activation;
+    this->layerNumber = layerNumber;
     this->connections_forward = std::vector<connection::Connection*>();
     this->connections_back = std::vector<connection::Connection*>();
 }
@@ -213,4 +215,10 @@ double Neuron::recursiveCalculate()
     }
 
     return this->value;
+}
+
+ConnectionDummy::ConnectionDummy(int inNeuronNumber, int outNeuronNumber)
+{
+    this->inNeuronNumber = inNeuronNumber;
+    this->outNeuronNumber = outNeuronNumber;
 }

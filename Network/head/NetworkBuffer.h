@@ -9,11 +9,11 @@
 namespace nn
 {
 
-    enum LayerType : unsigned int {Input, Output, Hidden, CustomConnectedHidden};
-    enum LayerConnectionType : unsigned int {FullyConnected};
+    enum LayerConnectionType : unsigned int {FullyConnected, CustomConnected};
 
-    struct NetworkBuffer
+    class NetworkBuffer
     {
+    public:
         int previousLayerSize;
 
         nn::InputLayer* inputLayer;
@@ -27,15 +27,17 @@ namespace nn
         NetworkBuffer();
         ~NetworkBuffer();
 
-        void addConnection(neuron::Neuron* in, neuron::Neuron* out);
-        void addConnection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber);
         void addNeuron(neuron::Neuron&& neuron, int layerNumber);
         void addNeuron(neuron::NeuronType type, neuron::Activation activation, int layerNumber);
-        void connect(int inNeuronNumber, int outNeuronNumber);
+        void addNeuron(neuron::NeuronType type, neuron::Activation activation, int layerNumber, double weight);
+        void connect(int inNeuronNumber, int outNeuronNumber, int innovationNumber=0);
 
         void addLayer(int numNeurons, neuron::Activation activation, LayerType layerType, LayerConnectionType connectionType);
 
         nn::NetworkBuffer getCopy();
+    
+    private:
+        void addConnection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber=0);
     };
 }
 

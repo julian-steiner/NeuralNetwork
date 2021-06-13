@@ -2,37 +2,47 @@
 
 using namespace nn;
 
-Layer::Layer(int size, neuron::Activation activation, nn::LayerConnectionType layerType)
+Layer::Layer(int size, neuron::Activation activation, nn::LayerConnectionType layerConnectionType)
 {
     this->size = size;
     this->activation = activation;
-    this->layerType = layerType;
+    this->layerConnectionType = layerConnectionType;
+    this->layerType = nn::LayerType::Input;
 }
 
-InputLayer::InputLayer(int size, neuron::Activation activation, nn::LayerConnectionType layerType)
+int Layer::getSize()
 {
-    this->size = size;
-    this->activation = activation;
-    this->layerType = layerType;
+    return this->neurons.size();
 }
 
-OutputLayer::OutputLayer(int size, neuron::Activation activation, nn::LayerConnectionType layerType)
+InputLayer::InputLayer(int size, neuron::Activation activation, nn::LayerConnectionType layerConnectionType)
 {
     this->size = size;
     this->activation = activation;
-    this->layerType = layerType;
+    this->layerConnectionType = layerConnectionType;
+    this->layerType = nn::LayerType::Input;
 }
 
-HiddenLayer::HiddenLayer(int size, neuron::Activation activation, nn::LayerConnectionType layerType)
+OutputLayer::OutputLayer(int size, neuron::Activation activation, nn::LayerConnectionType layerConnectionType)
 {
     this->size = size;
     this->activation = activation;
-    this->layerType = layerType;
+    this->layerConnectionType = layerConnectionType;
+    this->layerType = nn::LayerType::Output;
 }
 
-CustomConnectedHiddenLayer::CustomConnectedHiddenLayer(int size, neuron::Activation activation, nn::LayerConnectionType layerType)
+HiddenLayer::HiddenLayer(int size, neuron::Activation activation, nn::LayerConnectionType layerConnectionType)
 {
     this->size = size;
     this->activation = activation;
-    this->layerType = layerType;
+    this->layerConnectionType = layerConnectionType;
+    this->layerType = nn::LayerType::Hidden;
+}
+
+CustomConnectedHiddenLayer::CustomConnectedHiddenLayer(int size, neuron::Activation activation, nn::LayerConnectionType layerConnectionType)
+{
+    this->size = size;
+    this->activation = activation;
+    this->layerConnectionType = layerConnectionType;
+    this->layerType = nn::LayerType::CustomConnectedHidden;
 }

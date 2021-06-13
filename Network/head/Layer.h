@@ -6,6 +6,7 @@
 namespace nn
 {
     enum LayerConnectionType : unsigned int;
+    enum LayerType : unsigned int {Input, Output, Hidden, CustomConnectedHidden};
 
     struct Layer
     {
@@ -14,8 +15,12 @@ namespace nn
 
         int size;
         neuron::Activation activation;
-        nn::LayerConnectionType layerType;
+        nn::LayerConnectionType layerConnectionType;
+        nn::LayerType layerType;
         std::vector<neuron::Neuron*> neurons;
+        std::vector<connection::ConnectionDummy> connectionDummys;
+
+        int getSize();
     };
 
     struct InputLayer : public Layer

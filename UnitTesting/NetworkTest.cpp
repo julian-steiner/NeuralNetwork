@@ -27,7 +27,7 @@ TEST(NetworkBuffer, ConnectionCorrectlyAdded)
     testNetwork.addLayer(0, neuron::Activation::None, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
     testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, 0);
     testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, 0);
-    testNetwork.connect(1, 2);
+    testNetwork.connect(0, 1);
 
     ASSERT_EQ(testNetwork.neurons.size(), 2);
     ASSERT_EQ(testNetwork.connections.size(), 1);
@@ -40,7 +40,7 @@ TEST(NetworkBuffer, ConnectingWorkingCorrectly)
     testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, 0);
     testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::None, 0);
     
-    testNetwork.connect(1, 2);
+    testNetwork.connect(0, 1);
 
     ASSERT_EQ(testNetwork.neurons.size(), 2);
     ASSERT_EQ(testNetwork.connections.size(), 1);
@@ -75,6 +75,61 @@ TEST(NetworkBuffer, ConnectionsCorrectlyAdded)
     ASSERT_EQ(testNetwork.neurons.at(15)->connections_back.size(), 10);
     ASSERT_EQ(testNetwork.neurons.at(31)->connections_forward.size(), 0);
     ASSERT_EQ(testNetwork.neurons.at(31)->connections_back.size(), 20);
+}
+
+TEST(NetworkBuffer, BufferCopiedCorrectly)
+{
+    nn::NetworkBuffer testNetwork;
+
+    testNetwork.addLayer(10, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(20, neuron::Activation::Sigmoid, nn::LayerType::Hidden, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(0, neuron::Activation::Sigmoid, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
+
+    testNetwork.addNeuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, 2);
+    testNetwork.addNeuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, 2);
+
+    testNetwork.connect(31, 32);
+    testNetwork.connect(32, 33);
+
+    nn::NetworkBuffer testNetwork2 = testNetwork.getCopy();
+
+    ASSERT_EQ(testNetwork2.connections.size(), testNetwork.connections.size());
+    ASSERT_EQ(testNetwork2.neurons.at(0)->connections_forward.size(), testNetwork.neurons.at(0)->connections_forward.size());
+    ASSERT_EQ(testNetwork2.neurons.at(15)->connections_back.size(), testNetwork.neurons.at(15)->connections_back.size());
+    ASSERT_EQ(testNetwork2.neurons.at(31)->connections_forward.size(), testNetwork.neurons.at(31)->connections_forward.size());
+    ASSERT_EQ(testNetwork2.neurons.at(31)->connections_back.size(), testNetwork.neurons.at(31)->connections_back.size());
+
+}
+
+TEST(NetworkBuffer, LayerNumberAddedCorrectly)
+{
+    nn::NetworkBuffer testNetwork;
+
+    testNetwork.addLayer(1, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::FullyConnected);
+
+    ASSERT_EQ(testNetwork.neurons.at(2)->layerNumber, 1);
+}
+
+TEST(NetworkBuffer, ConnectionDummiesAddedCorrectly)
+{
+    nn::NetworkBuffer testNetwork;
+
+    testNetwork.addLayer(1, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(0, neuron::Activation::Sigmoid, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::FullyConnected);
+
+    testNetwork.addNeuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, 1);
+    testNetwork.addNeuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, 1);
+
+    testNetwork.connect(0, 1);
+    testNetwork.connect(1, 2);
+
+    ASSERT_EQ(testNetwork.layers.at(0)->connectionDummys.size(), 0);
+    ASSERT_EQ(testNetwork.layers.at(1)->connectionDummys.size(), 2);
+
+    ASSERT_EQ(testNetwork.layers.at(1)->connectionDummys.at(1).inNeuronNumber, 1);
+    ASSERT_EQ(testNetwork.layers.at(1)->connectionDummys.at(1).outNeuronNumber, 2);
 }
 
 TEST(NeuralNetwork, NetworkInheritanceWorkingCorrectly)
