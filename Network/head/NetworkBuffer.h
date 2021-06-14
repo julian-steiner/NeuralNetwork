@@ -30,7 +30,7 @@ namespace nn
         void addNeuron(neuron::Neuron&& neuron, int layerNumber);
         void addNeuron(neuron::NeuronType type, neuron::Activation activation, int layerNumber);
         void addNeuron(neuron::NeuronType type, neuron::Activation activation, int layerNumber, double weight);
-        void connect(int inNeuronNumber, int outNeuronNumber, int innovationNumber=0);
+        void connect(connection::NeuronLocation inNeuronNumber, connection::NeuronLocation outNeuronLocation, int innovationNumber=0);
 
         void addLayer(int numNeurons, neuron::Activation activation, LayerType layerType, LayerConnectionType connectionType);
 

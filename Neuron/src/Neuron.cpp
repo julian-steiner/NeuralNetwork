@@ -25,7 +25,7 @@ Connection::Connection(neuron::Neuron* in, neuron::Neuron* out, int innovationNu
     this->configureConnectedNeurons();
 }
 
-Connection::Connection(neuron::Neuron* in, neuron::Neuron* out, int inNeuronNumber, int outNeuronNumber)
+Connection::Connection(neuron::Neuron* in, neuron::Neuron* out, connection::NeuronLocation inNeuronLocation, connection::NeuronLocation outNeuronLocation)
 {
     this->enabled = true;
     this->in = in;
@@ -33,8 +33,8 @@ Connection::Connection(neuron::Neuron* in, neuron::Neuron* out, int inNeuronNumb
     this->innovationNumber = 0;
     this->weight = (double)std::rand() / (double)RAND_MAX * 2 - 1;
     this->isConnected = false;
-    this->inNeuronNumber = inNeuronNumber;
-    this->outNeuronNumber = outNeuronNumber;
+    this->inNeuronLocation = inNeuronLocation;
+    this->outNeuronLocation = outNeuronLocation;
     this->configureConnectedNeurons();
 }
 
@@ -217,8 +217,8 @@ double Neuron::recursiveCalculate()
     return this->value;
 }
 
-ConnectionDummy::ConnectionDummy(int inNeuronNumber, int outNeuronNumber)
+ConnectionDummy::ConnectionDummy(connection::NeuronLocation inNeuronLocation, connection::NeuronLocation outNeuronLocation)
 {
-    this->inNeuronNumber = inNeuronNumber;
-    this->outNeuronNumber = outNeuronNumber;
+    this->inNeuronLocation = inNeuronLocation;
+    this->outNeuronLocation = outNeuronLocation;
 }

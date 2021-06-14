@@ -47,12 +47,18 @@ namespace neuron
 
 namespace connection
 {
+    struct NeuronLocation
+    {
+       int layer;
+       int number; 
+    };
+
     struct Connection
     {
         neuron::Neuron* in;
         neuron::Neuron* out;
-        int inNeuronNumber;
-        int outNeuronNumber;
+        connection::NeuronLocation inNeuronLocation;
+        connection::NeuronLocation outNeuronLocation;
         double weight;
         bool enabled;
         int innovationNumber;
@@ -60,17 +66,17 @@ namespace connection
 
         Connection(neuron::Neuron* in, neuron::Neuron* out);
         Connection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber);
-        Connection(neuron::Neuron* in, neuron::Neuron* out, int inNeuronNumber, int outNeuronNumber);
+        Connection(neuron::Neuron* in, neuron::Neuron* out, connection::NeuronLocation inNeuronLocation, connection::NeuronLocation outNeuronLocation);
 
         void configureConnectedNeurons();
     };
 
     struct ConnectionDummy
     {
-        int inNeuronNumber;
-        int outNeuronNumber;
+        connection::NeuronLocation inNeuronLocation;
+        connection::NeuronLocation outNeuronLocation;
 
-        ConnectionDummy(int inNeuronNumber, int outNeuronNumber);
+        ConnectionDummy(connection::NeuronLocation inNeuronLocation, connection::NeuronLocation outNeuronLocation);
     };
 }
 

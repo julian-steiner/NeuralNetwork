@@ -34,14 +34,14 @@ void NetworkBuffer::addConnection(neuron::Neuron* in, neuron::Neuron* out, int i
     this->connections.push_back(new connection::Connection(in, out, innovationNumber));
 }
 
-void NetworkBuffer::connect(int inNeuronNumber, int outNeuronNumber, int innovationNumber)
+void NetworkBuffer::connect(connection::NeuronLocation inNeuronLocation, connection::NeuronLocation outNeuronLocation, int innovationNumber)
 {
-    neuron::Neuron* in = this->neurons.at(inNeuronNumber);
-    neuron::Neuron* out = this->neurons.at(outNeuronNumber);
+    neuron::Neuron* in = this->layers.at(inNeuronLocation.layer)->neurons.at(inNeuronLocation.number);
+    neuron::Neuron* out = this->layers.at(outNeuronLocation.layer)->neurons.at(outNeuronLocation.number);
     addConnection(in, out, innovationNumber);
 
     // Add the connection to the connectionDummies in the layer (only to the out to prevent redundancy)
-    this->layers.at(out->layerNumber)->connectionDummys.emplace_back(connection::ConnectionDummy(inNeuronNumber, outNeuronNumber));
+    this->layers.at(out->layerNumber)->connectionDummys.emplace_back(connection::ConnectionDummy(inNeuronLocation, outNeuronLocation));
 }
 
 void NetworkBuffer::addNeuron(neuron::NeuronType type, neuron::Activation activation, int layerNumber)
@@ -118,11 +118,11 @@ void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, Laye
                 //Reserving the space in the connections Vector
                 this->connections.reserve(this->connections.size() + (numNeurons * previousLayerSize));
 
-                for(int i = currentNetworkSize; i < currentNetworkSize + numNeurons; i++)
+                for(int i = 0; i < this->layers.at(currentLayerNumber)->getSize(); i++)
                 {
-                    for(int a = currentNetworkSize - this->previousLayerSize; a < currentNetworkSize; a++)
+                    for(int a = 0; a < this->layers.at(currentLayerNumber-1)->getSize(); a++)
                     {
-                        connect(a, i);
+                        connect({currentLayerNumber-1, a}, {currentLayerNumber, i});
                     }
                 }
             }
@@ -160,6 +160,9 @@ nn::NetworkBuffer nn::NetworkBuffer::getCopy()
                 break;
         }
 
+        // Copy all the layer parameters to the new layer
+        tempNetworkBuffer.layers.back()->connectionDummys = currentLayer->connectionDummys;
+
         // Add the neurons
         for (neuron::Neuron* currentNeuron : currentLayer->neurons)
         {
@@ -173,7 +176,7 @@ nn::NetworkBuffer nn::NetworkBuffer::getCopy()
         // Add the connections
         for (connection::ConnectionDummy currentConnectionDummy : currentLayer->connectionDummys)
         {
-            tempNetworkBuffer.connect(currentConnectionDummy.inNeuronNumber, currentConnectionDummy.outNeuronNumber);
+            tempNetworkBuffer.connect(currentConnectionDummy.inNeuronLocation, currentConnectionDummy.outNeuronLocation);
         }
     }
 
