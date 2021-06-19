@@ -94,7 +94,7 @@ TEST(NetworkBuffer, BufferCopiedCorrectly)
 
     testNetwork.layers.at(2)->neurons.at(0)->bias = 69;
 
-    nn::NetworkBuffer testNetwork2 = testNetwork.getCopy();
+    nn::NeuralNetwork testNetwork2 = testNetwork.getCopy<nn::NeuralNetwork>();
 
     ASSERT_EQ(testNetwork2.connections.size(), testNetwork.connections.size());
     ASSERT_EQ(testNetwork2.neurons.at(0)->connections_forward.size(), testNetwork.neurons.at(0)->connections_forward.size());

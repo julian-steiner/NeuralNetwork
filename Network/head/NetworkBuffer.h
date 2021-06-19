@@ -4,10 +4,10 @@
 #include <vector>
 #include <memory>
 #include "Layer.h"
-#include "../../Neuron/head/Neuron.h"
 
 namespace nn
 {
+    class NeuralNetwork;
 
     enum LayerConnectionType : unsigned int {FullyConnected, CustomConnected};
 
@@ -34,7 +34,8 @@ namespace nn
 
         void addLayer(int numNeurons, neuron::Activation activation, LayerType layerType, LayerConnectionType connectionType);
 
-        nn::NetworkBuffer getCopy();
+        template<typename T>
+        T getCopy();
     
     private:
         void addConnection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber=0);

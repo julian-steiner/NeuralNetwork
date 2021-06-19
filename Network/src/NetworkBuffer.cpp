@@ -1,4 +1,5 @@
 #include "NetworkBuffer.h"
+#include "NeuralNetwork.h"
 
 using namespace nn;
 
@@ -131,9 +132,10 @@ void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, Laye
     this->currentLayerNumber ++;
 }
 
-nn::NetworkBuffer nn::NetworkBuffer::getCopy()
+template<typename T>
+T nn::NetworkBuffer::getCopy()
 {
-    nn::NetworkBuffer tempNetworkBuffer;
+    T tempNetworkBuffer;
 
     // Add every layer
     for (nn::Layer* currentLayer : this->layers)
@@ -182,3 +184,6 @@ nn::NetworkBuffer nn::NetworkBuffer::getCopy()
 
     return tempNetworkBuffer;
 }
+
+template nn::NetworkBuffer nn::NetworkBuffer::getCopy<nn::NetworkBuffer>();
+template nn::NeuralNetwork nn::NetworkBuffer::getCopy<nn::NeuralNetwork>();
