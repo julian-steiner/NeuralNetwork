@@ -20,12 +20,14 @@ namespace nn
         nn::OutputLayer* outputLayer;
 
         int currentLayerNumber;
-        std::vector<neuron::Neuron*> neurons;
-        std::vector<connection::Connection*> connections;
-        std::vector<nn::Layer*> layers;
+        std::vector<neuron::Neuron*>* neurons;
+        std::vector<connection::Connection*>* connections;
+        std::vector<nn::Layer*>* layers;
 
         NetworkBuffer();
         ~NetworkBuffer();
+        NetworkBuffer(const NetworkBuffer& other);
+        NetworkBuffer(NetworkBuffer&& other);
 
         void addNeuron(neuron::Neuron&& neuron, int layerNumber);
         void addNeuron(neuron::NeuronType type, neuron::Activation activation, int layerNumber);

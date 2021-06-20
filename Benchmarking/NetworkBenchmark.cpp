@@ -28,8 +28,8 @@ int main()
             network.addLayer(16, neuron::Activation::Sigmoid, nn::LayerType::Hidden, nn::LayerConnectionType::FullyConnected);
             network.addLayer(9, neuron::Activation::Sigmoid, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
 
-            std::cout << network.connections.size() << std::endl; 
-            std::cout << network.neurons.size() << std::endl;
+            std::cout << network.connections->size() << std::endl; 
+            std::cout << network.neurons->size() << std::endl;
         }
 
         {

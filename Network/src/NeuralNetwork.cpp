@@ -16,7 +16,7 @@ std::vector<double> nn::NeuralNetwork::predict(std::vector<double> inputs)
     }
 
     // reset the cache on the neurons 
-    for (neuron::Neuron* c_neuron: this->neurons)
+    for (neuron::Neuron* c_neuron: *this->neurons)
     {
         c_neuron->rewriteCache = true;
     }

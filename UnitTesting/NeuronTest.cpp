@@ -9,7 +9,7 @@ double sigmoid(double x)
 
 TEST(Neuron, NeuronInitializedCorrectly)
 {
-    std::shared_ptr<neuron::Neuron> testNeuron = std::make_shared<neuron::Neuron>(neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid));
+    std::shared_ptr<neuron::Neuron> testNeuron = std::make_shared<neuron::Neuron>(neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, false));
     ASSERT_EQ(testNeuron->activation, neuron::Activation::Sigmoid);
     ASSERT_EQ(testNeuron->value, 0);
     ASSERT_EQ(testNeuron->type, neuron::NeuronType::Input);
@@ -18,10 +18,10 @@ TEST(Neuron, NeuronInitializedCorrectly)
 
 TEST(Neuron, BinaryActivationWorkingCorrectly)
 {
-    neuron::Neuron testNeuron = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Binary);
+    neuron::Neuron testNeuron = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Binary, false);
     testNeuron.value = 0.5;
 
-    neuron::Neuron testNeuron2 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::Binary);
+    neuron::Neuron testNeuron2 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::Binary, false);
     testNeuron2.bias = 0;
 
     connection::Connection connection = connection::Connection(&testNeuron, &testNeuron2);
@@ -36,7 +36,7 @@ TEST(Neuron, BinaryActivationWorkingCorrectly)
 
 TEST(Neuron, InputNeuronComputingCorrectly)
 {
-    neuron::Neuron testNeuron = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::None);
+    neuron::Neuron testNeuron = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::None, false);
     testNeuron.value = 53;
     testNeuron.bias = 23103910;
 
@@ -47,13 +47,13 @@ TEST(Neuron, InputNeuronComputingCorrectly)
 
 TEST(Neuron, ComputingCorrectlyWithoutCache)
 {
-    neuron::Neuron testNeuron = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid);
+    neuron::Neuron testNeuron = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, false);
     testNeuron.value = 54;
 
-    neuron::Neuron testNeuron2 = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid);
+    neuron::Neuron testNeuron2 = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, false);
     testNeuron2.value = 100;
 
-    neuron::Neuron testNeuron3 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, false);
+    neuron::Neuron testNeuron3 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, false, false);
     testNeuron3.bias = 1;
 
     connection::Connection connection1 = connection::Connection(&testNeuron, &testNeuron3);
@@ -69,10 +69,10 @@ TEST(Neuron, ComputingCorrectlyWithoutCache)
 
 TEST(Neuron, ComputingCorrectlyWithoutRefreshingCache)
 {
-    neuron::Neuron testNeuron = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid);
+    neuron::Neuron testNeuron = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, false);
     testNeuron.value = 54;
 
-    neuron::Neuron testNeuron2 = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid);
+    neuron::Neuron testNeuron2 = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, false);
     testNeuron2.value = 100;
 
     neuron::Neuron testNeuron3 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, true);
@@ -91,10 +91,10 @@ TEST(Neuron, ComputingCorrectlyWithoutRefreshingCache)
 
 TEST(Neuron, ComputingCorrectlyWithRefreshingCache)
 {
-    neuron::Neuron testNeuron = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid);
+    neuron::Neuron testNeuron = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, false);
     testNeuron.value = 54;
 
-    neuron::Neuron testNeuron2 = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid);
+    neuron::Neuron testNeuron2 = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, false);
     testNeuron2.value = 100;
 
     neuron::Neuron testNeuron3 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, true);
@@ -117,16 +117,16 @@ TEST(Neuron, ComputingCorrectlyWithRefreshingCache)
 
 TEST(Neuron, ReverseCalculateWorkingCorrectly)
 {
-    neuron::Neuron testNeuron = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid);
+    neuron::Neuron testNeuron = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, false);
     testNeuron.value = 54;
 
-    neuron::Neuron testNeuron2 = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid);
+    neuron::Neuron testNeuron2 = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, false);
     testNeuron2.value = 100;
 
-    neuron::Neuron testNeuron3 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::None);
+    neuron::Neuron testNeuron3 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::None, false);
     testNeuron3.bias = 3;
 
-    neuron::Neuron testNeuron4 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::None);
+    neuron::Neuron testNeuron4 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::None, false);
     testNeuron4.bias = 4;
 
     connection::Connection connection1 = connection::Connection(&testNeuron, &testNeuron3);
@@ -145,9 +145,9 @@ TEST(Neuron, ReverseCalculateWorkingCorrectly)
 
 TEST(Connection, ConnectionInitializedCorrectly)
 {
-    neuron::Neuron testNeuron = neuron::Neuron(neuron::NeuronType::Output, neuron::Activation::Sigmoid);
+    neuron::Neuron testNeuron = neuron::Neuron(neuron::NeuronType::Output, neuron::Activation::Sigmoid, false);
     testNeuron.value = 54;
-    neuron::Neuron testNeuron2 = neuron::Neuron(neuron::NeuronType::Output, neuron::Activation::Sigmoid);
+    neuron::Neuron testNeuron2 = neuron::Neuron(neuron::NeuronType::Output, neuron::Activation::Sigmoid, false);
 
     connection::Connection testConnection(&testNeuron, &testNeuron2);
     
@@ -161,8 +161,8 @@ TEST(Connection, ConnectionInitializedCorrectly)
 
 TEST(Connection, ConnectionAssignedCorrectlyToNeurons)
 {
-    neuron::Neuron testNeuron1 = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid);
-    neuron::Neuron testNeuron2 = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid);
+    neuron::Neuron testNeuron1 = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, false);
+    neuron::Neuron testNeuron2 = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, false);
     connection::Connection testConnection(&testNeuron1, &testNeuron2);
 
     testConnection.configureConnectedNeurons();

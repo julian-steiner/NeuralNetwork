@@ -26,6 +26,7 @@ set(NetworkSources
 set(TestingSources
     UnitTesting/NeuronTest.cpp
     UnitTesting/NetworkTest.cpp
+    UnitTesting/PopulationTest.cpp
 )
 
 set(BenchmarkingSources

@@ -8,7 +8,9 @@ namespace population
     class Population
     {
         public:
-        Population(const int& size, nn::NeuralNetwork templateNetwork);
+        Population(const int& size, nn::NeuralNetwork* templateNetwork);
+
+        nn::NeuralNetwork* getNetwork(int number);
 
         private:
         std::vector<nn::NeuralNetwork> networks;
