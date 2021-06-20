@@ -40,7 +40,7 @@ namespace nn
         T getCopy();
     
     private:
-        void addConnection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber=0);
+        void addConnection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber=0, connection::NeuronLocation inNeuronLocation = {0, 0}, connection::NeuronLocation outNeuronLocation = {0, 0});
     };
 }
 

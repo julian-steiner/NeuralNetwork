@@ -54,30 +54,32 @@ namespace connection
        int number; 
     };
 
-    struct Connection
-    {
-        neuron::Neuron* in;
-        neuron::Neuron* out;
-        connection::NeuronLocation inNeuronLocation;
-        connection::NeuronLocation outNeuronLocation;
-        double weight;
-        bool enabled;
-        int innovationNumber;
-        bool isConnected;
-
-        Connection(neuron::Neuron* in, neuron::Neuron* out);
-        Connection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber);
-        Connection(neuron::Neuron* in, neuron::Neuron* out, connection::NeuronLocation inNeuronLocation, connection::NeuronLocation outNeuronLocation);
-
-        void configureConnectedNeurons();
-    };
-
     struct ConnectionDummy
     {
         connection::NeuronLocation inNeuronLocation;
         connection::NeuronLocation outNeuronLocation;
+        int innovationNumber;
+        ConnectionDummy(connection::NeuronLocation inNeuronLocation, connection::NeuronLocation outNeuronLocation, int innovationNumber);
+        ConnectionDummy() = default;
+    };
 
-        ConnectionDummy(connection::NeuronLocation inNeuronLocation, connection::NeuronLocation outNeuronLocation);
+    struct Connection
+    {
+        neuron::Neuron* in;
+        neuron::Neuron* out;
+        double weight;
+        bool enabled;
+        int innovationNumber;
+        connection::NeuronLocation inNeuronLocation;
+        connection::NeuronLocation outNeuronLocation;
+
+        bool isConnected;
+
+        Connection(neuron::Neuron* in, neuron::Neuron* out);
+        Connection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber);
+        Connection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber, connection::NeuronLocation inNeuronLocation, connection::NeuronLocation outNeuronLocation);
+
+        void configureConnectedNeurons();
     };
 }
 

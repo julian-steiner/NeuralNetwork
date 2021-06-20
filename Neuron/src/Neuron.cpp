@@ -5,34 +5,34 @@ using namespace connection;
 
 Connection::Connection(neuron::Neuron* in, neuron::Neuron* out)
 {
-    this->enabled = true;
-    this->in = in;
-    this->out = out;
-    this->innovationNumber = 0;
-    this->weight = (double)std::rand() / (double)RAND_MAX * 2 - 1;
-    this->isConnected = false;
-    this->configureConnectedNeurons();
+this->enabled = true;
+this->in = in;
+this->out = out;
+this->innovationNumber = 0;
+this->weight = (double)std::rand() / (double)RAND_MAX * 2 - 1;
+this->isConnected = false;
+this->configureConnectedNeurons();
 }
 
 Connection::Connection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber)
 {
-    this->enabled = true;
-    this->in = in;
-    this->out = out;
-    this->innovationNumber = innovationNumber;
-    this->weight = (double)std::rand() / (double)RAND_MAX * 2 - 1;
-    this->isConnected = false;
-    this->configureConnectedNeurons();
+this->enabled = true;
+this->in = in;
+this->out = out;
+this->innovationNumber = innovationNumber;
+this->weight = (double)std::rand() / (double)RAND_MAX * 2 - 1;
+this->isConnected = false;
+this->configureConnectedNeurons();
 }
 
-Connection::Connection(neuron::Neuron* in, neuron::Neuron* out, connection::NeuronLocation inNeuronLocation, connection::NeuronLocation outNeuronLocation)
+Connection::Connection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber, connection::NeuronLocation inNeuronLocation, connection::NeuronLocation outNeuronLocation)
 {
     this->enabled = true;
     this->in = in;
     this->out = out;
-    this->innovationNumber = 0;
     this->weight = (double)std::rand() / (double)RAND_MAX * 2 - 1;
     this->isConnected = false;
+    this->innovationNumber = innovationNumber;
     this->inNeuronLocation = inNeuronLocation;
     this->outNeuronLocation = outNeuronLocation;
     this->configureConnectedNeurons();
@@ -235,8 +235,9 @@ double Neuron::recursiveCalculate()
     return this->value;
 }
 
-ConnectionDummy::ConnectionDummy(connection::NeuronLocation inNeuronLocation, connection::NeuronLocation outNeuronLocation)
+ConnectionDummy::ConnectionDummy(connection::NeuronLocation inNeuronLocation, connection::NeuronLocation outNeuronLocation, int innovationNumber)
 {
     this->inNeuronLocation = inNeuronLocation;
     this->outNeuronLocation = outNeuronLocation;
+    this->innovationNumber = innovationNumber;
 }

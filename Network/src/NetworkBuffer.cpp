@@ -120,19 +120,19 @@ NetworkBuffer::NetworkBuffer(NetworkBuffer&& other)
     other.neurons = nullptr;
 }
 
-void NetworkBuffer::addConnection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber)
+void NetworkBuffer::addConnection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber, connection::NeuronLocation inNeuronLocation, connection::NeuronLocation outNeuronLocation)
 {
-    this->connections->push_back(new connection::Connection(in, out, innovationNumber));
+    this->connections->push_back(new connection::Connection(in, out, innovationNumber, inNeuronLocation, outNeuronLocation));
 }
 
 void NetworkBuffer::connect(connection::NeuronLocation inNeuronLocation, connection::NeuronLocation outNeuronLocation, int innovationNumber)
 {
     neuron::Neuron* in = this->layers->at(inNeuronLocation.layer)->neurons.at(inNeuronLocation.number);
     neuron::Neuron* out = this->layers->at(outNeuronLocation.layer)->neurons.at(outNeuronLocation.number);
-    addConnection(in, out, innovationNumber);
+    addConnection(in, out, innovationNumber, inNeuronLocation, outNeuronLocation);
 
     // Add the connection to the connectionDummies in the layer (only to the out to prevent redundancy)
-    this->layers->at(out->layerNumber)->connectionDummys.emplace_back(connection::ConnectionDummy(inNeuronLocation, outNeuronLocation));
+    this->layers->at(out->layerNumber)->connectionDummys.emplace_back(connection::ConnectionDummy(inNeuronLocation, outNeuronLocation, innovationNumber));
 }
 
 void NetworkBuffer::addNeuron(neuron::NeuronType type, neuron::Activation activation, int layerNumber)
@@ -277,7 +277,7 @@ T nn::NetworkBuffer::getCopy()
         // Add the connections
         for (connection::ConnectionDummy currentConnectionDummy : currentLayer->connectionDummys)
         {
-            tempNetworkBuffer.connect(currentConnectionDummy.inNeuronLocation, currentConnectionDummy.outNeuronLocation);
+            tempNetworkBuffer.connect(currentConnectionDummy.inNeuronLocation, currentConnectionDummy.outNeuronLocation, currentConnectionDummy.innovationNumber);
         }
     }
 
