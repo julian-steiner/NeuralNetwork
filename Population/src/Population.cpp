@@ -36,7 +36,7 @@ void Population::mutate()
 {
     double randomNumber;
 
-    for (nn::NeuralNetwork currentNeuralNetwork : this->networks)
+    for (nn::NeuralNetwork& currentNeuralNetwork : this->networks)
     {
         // handle all the mutations based on a connection
         for (connection::Connection* currentConnection : *currentNeuralNetwork.connections)
@@ -55,26 +55,39 @@ void Population::mutate()
             nn::Layer* currentLayer = currentNeuralNetwork.layers->at(i);
             for (int a = 0; a < currentLayer->neurons.size(); a++)
             {
-                neuron::Neuron* currentNeuron = currentNeuralNetwork.neurons->at(a);
+                //neuron::Neuron* currentNeuron = currentLayer.neurons->at(a);
+                neuron::Neuron* currentNeuron = currentLayer->neurons.at(a);
                 randomNumber = std::rand() / RAND_MAX;
 
                 if (randomNumber < structuralMutationRate)
                 {
-                    int randomLayerNumber = (int) (std::rand() / RAND_MAX) * 2 + 1;
-                    int randomNeuronNumber = (std::rand() / (double)RAND_MAX * currentNeuralNetwork.layers->at(randomLayerNumber)->getSize());
+                    // get a random layer number and select a random neuron out of this layer
+                    int randomLayerNumber = (int) ((std::rand() / (double)RAND_MAX)>0.5) + 1;
+                    std::cout << randomLayerNumber << std::endl;
+                    
+                    int randomNeuronNumber = (std::rand() / (double)RAND_MAX * currentNeuralNetwork.layers->at(randomLayerNumber)->getSize() - 1);
+                    std::cout << randomNeuronNumber << " randomNeuronNumber " << std::endl;
+
+                    // if the layer is empty, go to the next layer
+                    if (randomNeuronNumber == -1)
+                    {
+                        randomLayerNumber ++;
+                        randomNeuronNumber = (std::rand() / (double)RAND_MAX * currentNeuralNetwork.layers->at(randomLayerNumber)->getSize()) - 1;
+                    }
+
                     bool alreadyConnected = false;
                     
                     // check if the neuron is connected already
                     for (connection::Connection* currentConnection : currentNeuron->connections_forward)
                     {
-                        if (currentConnection->inNeuronLocation.layer == randomLayerNumber && currentConnection->inNeuronLocation.number == randomNeuronNumber)
+                        if (currentConnection->outNeuronLocation.layer == randomLayerNumber && currentConnection->outNeuronLocation.number == randomNeuronNumber)
                         {
                             addNeuron(&currentNeuralNetwork, currentConnection);
                             alreadyConnected = true;
                         }
                     }
 
-                    if (alreadyConnected == false)
+                    if (alreadyConnected == false && (i != randomLayerNumber || a != randomNeuronNumber))
                     {
                         addConnection(&currentNeuralNetwork, {i, a}, {randomLayerNumber, randomNeuronNumber});
                     }
@@ -99,8 +112,8 @@ void Population::addNeuron(nn::NeuralNetwork* targetNetwork, connection::Connect
 {
     target->enabled = false;
     targetNetwork->addNeuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, 1);
-    targetNetwork->connect(target->inNeuronLocation, {1, (int)targetNetwork->neurons->size()}, currentInnovationNumber);
+    targetNetwork->connect(target->inNeuronLocation, {1, (int)targetNetwork->layers->at(1)->getSize()-1}, currentInnovationNumber);
     currentInnovationNumber ++;
-    targetNetwork->connect({1, (int)targetNetwork->neurons->size()}, target->outNeuronLocation, currentInnovationNumber);
+    targetNetwork->connect({1, (int)targetNetwork->layers->at(1)->getSize()-1}, target->outNeuronLocation, currentInnovationNumber);
     currentInnovationNumber ++;
 }
