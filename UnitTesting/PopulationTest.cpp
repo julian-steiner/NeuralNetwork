@@ -48,7 +48,6 @@ TEST(Population, PopulationAddingConnectionCorrectly)
     testPopulation.mutate();
 
     std::vector<connection::Connection*> connections;
-
     std::cout << "Connections size: " << testPopulation.getNetwork(0)->connections->size() << std::endl;
     for (connection::Connection* connectionPtr : *testPopulation.getNetwork(0)->connections)
     {

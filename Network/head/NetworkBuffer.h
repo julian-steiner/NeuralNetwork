@@ -13,6 +13,11 @@ namespace nn
 
     class NetworkBuffer
     {
+
+    private:
+        void addConnection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber=0, connection::NeuronLocation inNeuronLocation = {0, 0}, connection::NeuronLocation outNeuronLocation = {0, 0});
+        bool RecursivelyCheckForRecursion(neuron::Neuron* currentNeuron, neuron::Neuron* targetNeuron);
+
     public:
         int previousLayerSize;
 
@@ -33,14 +38,13 @@ namespace nn
         void addNeuron(neuron::NeuronType type, neuron::Activation activation, int layerNumber);
         void addNeuron(neuron::NeuronType type, neuron::Activation activation, int layerNumber, double weight);
         void connect(connection::NeuronLocation inNeuronNumber, connection::NeuronLocation outNeuronLocation, int innovationNumber=0);
+        bool checkForRecursion(connection::NeuronLocation inNeuronNumber, connection::NeuronLocation outNeuronNumber);
 
         void addLayer(int numNeurons, neuron::Activation activation, LayerType layerType, LayerConnectionType connectionType);
 
         template<typename T>
         T getCopy();
     
-    private:
-        void addConnection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber=0, connection::NeuronLocation inNeuronLocation = {0, 0}, connection::NeuronLocation outNeuronLocation = {0, 0});
     };
 }
 

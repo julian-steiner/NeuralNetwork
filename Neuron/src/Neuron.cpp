@@ -241,3 +241,8 @@ ConnectionDummy::ConnectionDummy(connection::NeuronLocation inNeuronLocation, co
     this->outNeuronLocation = outNeuronLocation;
     this->innovationNumber = innovationNumber;
 }
+
+bool operator==(const connection::NeuronLocation& first, const connection::NeuronLocation& second)
+{
+    return first.layer == second.layer && first.number == second.number;
+}

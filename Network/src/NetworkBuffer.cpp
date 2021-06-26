@@ -222,6 +222,29 @@ void NetworkBuffer::addLayer(int numNeurons, neuron::Activation activation, Laye
     this->currentLayerNumber ++;
 }
 
+bool nn::NetworkBuffer::RecursivelyCheckForRecursion(neuron::Neuron* currentNeuron, neuron::Neuron* targetNeuron)
+{
+    if (currentNeuron == targetNeuron)
+    {
+        return true;
+    }
+
+    for (connection::Connection* currentConnection : currentNeuron->connections_back)
+    {
+        if (RecursivelyCheckForRecursion(currentConnection->in, targetNeuron))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool nn::NetworkBuffer::checkForRecursion(connection::NeuronLocation inNeuronLocation, connection::NeuronLocation outNeuronLocation)
+{
+    return RecursivelyCheckForRecursion(this->layers->at(outNeuronLocation.layer)->neurons.at(outNeuronLocation.number), this->layers->at(inNeuronLocation.layer)->neurons.at(inNeuronLocation.number));
+}
+
 template<typename T>
 T nn::NetworkBuffer::getCopy()
 {

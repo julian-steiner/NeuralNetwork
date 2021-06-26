@@ -135,6 +135,21 @@ TEST(NetworkBuffer, ConnectionDummiesAddedCorrectly)
     ASSERT_EQ(testNetwork.layers->at(1)->connectionDummys.at(1).outNeuronLocation.layer, 1);
 }
 
+TEST(NetworkBuffer, RecursionTestCorrectly)
+{
+    nn::NetworkBuffer testNetworkBuffer1;
+
+    testNetworkBuffer1.addLayer(1, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetworkBuffer1.addLayer(1, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetworkBuffer1.addLayer(1, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+
+    ASSERT_EQ(testNetworkBuffer1.checkForRecursion({0, 0}, {2, 0}), true);
+
+    testNetworkBuffer1.addNeuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, 2);
+
+    ASSERT_EQ(false, testNetworkBuffer1.checkForRecursion({0, 0}, {2, 1}));
+}
+
 TEST(NeuralNetwork, NetworkInheritanceWorkingCorrectly)
 {
     nn::NeuralNetwork testNetwork; 

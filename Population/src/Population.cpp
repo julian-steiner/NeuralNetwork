@@ -53,20 +53,21 @@ void Population::mutate()
         for (int i = 0; i < 2; i++)
         {
             nn::Layer* currentLayer = currentNeuralNetwork.layers->at(i);
-            for (int a = 0; a < currentLayer->neurons.size(); a++)
+
+            int currentLayerSize = currentLayer->getSize();
+
+            for (int a = 0; a < currentLayerSize; a++)
             {
-                //neuron::Neuron* currentNeuron = currentLayer.neurons->at(a);
                 neuron::Neuron* currentNeuron = currentLayer->neurons.at(a);
+
                 randomNumber = std::rand() / RAND_MAX;
 
                 if (randomNumber < structuralMutationRate)
                 {
                     // get a random layer number and select a random neuron out of this layer
                     int randomLayerNumber = (int) ((std::rand() / (double)RAND_MAX)>0.5) + 1;
-                    std::cout << randomLayerNumber << std::endl;
                     
                     int randomNeuronNumber = (std::rand() / (double)RAND_MAX * currentNeuralNetwork.layers->at(randomLayerNumber)->getSize() - 1);
-                    std::cout << randomNeuronNumber << " randomNeuronNumber " << std::endl;
 
                     // if the layer is empty, go to the next layer
                     if (randomNeuronNumber == -1)
@@ -87,7 +88,7 @@ void Population::mutate()
                         }
                     }
 
-                    if (alreadyConnected == false && (i != randomLayerNumber || a != randomNeuronNumber))
+                    if (alreadyConnected == false && (i != randomLayerNumber || a != randomNeuronNumber) && !currentNeuralNetwork.checkForRecursion({i, a}, {randomLayerNumber, randomNeuronNumber}))
                     {
                         addConnection(&currentNeuralNetwork, {i, a}, {randomLayerNumber, randomNeuronNumber});
                     }
