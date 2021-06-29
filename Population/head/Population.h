@@ -16,9 +16,13 @@ namespace population
         nn::NeuralNetwork* getNetwork(int number);
         int getCurrentInnovationNumber();
 
+        void crossover();
         void mutate();
 
         private:
+        nn::NeuralNetwork getChild(nn::NeuralNetwork* first, nn::NeuralNetwork* second);
+        int getSize();
+        double getTotalFitness();
         void weightMutate(connection::Connection* target);
         void addConnection(nn::NeuralNetwork* targetNetwork, connection::NeuronLocation neuron1, connection::NeuronLocation neuron2);
         void addNeuron(nn::NeuralNetwork* targetNetwork, connection::Connection* target);

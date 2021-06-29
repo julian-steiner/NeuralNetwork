@@ -47,16 +47,9 @@ TEST(Population, PopulationAddingConnectionCorrectly)
 
     testPopulation.mutate();
 
-    std::vector<connection::Connection*> connections;
-    std::cout << "Connections size: " << testPopulation.getNetwork(0)->connections->size() << std::endl;
-    for (connection::Connection* connectionPtr : *testPopulation.getNetwork(0)->connections)
-    {
-        connections.push_back(connectionPtr);
-    }
-
-    ASSERT_EQ(testPopulation.getNetwork(0)->connections->size(), 3);
+    ASSERT_TRUE(testPopulation.getNetwork(0)->connections->size() == 3 || testPopulation.getNetwork(0)->connections->size() == 5);
     ASSERT_EQ(testPopulation.getNetwork(0)->connections->at(0)->enabled, false);
-    ASSERT_EQ(testPopulation.getNetwork(0)->layers->at(1)->getSize(), 1);
+    ASSERT_TRUE(testPopulation.getNetwork(0)->layers->at(1)->getSize() == 1 || testPopulation.getNetwork(0)->layers->at(1)->getSize() == 2);
 
     ASSERT_EQ(testPopulation.getNetwork(0)->connections->at(1)->inNeuronLocation.layer, 0);
     ASSERT_EQ(testPopulation.getNetwork(0)->connections->at(1)->inNeuronLocation.number, 0);
@@ -67,4 +60,29 @@ TEST(Population, PopulationAddingConnectionCorrectly)
     ASSERT_EQ(testPopulation.getNetwork(0)->connections->at(2)->inNeuronLocation.number, 0);
     ASSERT_EQ(testPopulation.getNetwork(0)->connections->at(2)->outNeuronLocation.layer, 2);
     ASSERT_EQ(testPopulation.getNetwork(0)->connections->at(2)->outNeuronLocation.number, 0);
+}
+
+TEST(Population, CrossingOverworkingCorrectly)
+{
+    nn::NeuralNetwork testNetwork;
+    testNetwork.addLayer(1, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(0, neuron::Activation::Sigmoid, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
+    testNetwork.addLayer(1, neuron::Activation::Sigmoid, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
+
+    population::Population testPopulation(2, &testNetwork);
+
+    testPopulation.getNetwork(0)->addNeuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, 1);
+    testPopulation.getNetwork(0)->connect({0, 0}, {1, 0}, 1);
+    testPopulation.getNetwork(0)->connect({1, 0}, {2, 0}, 2);
+    testPopulation.getNetwork(0)->fitness = 2;
+    testPopulation.getNetwork(0)->connections->at(0)->weight = 420;
+    testPopulation.getNetwork(0)->connections->at(1)->weight = 69;
+    testPopulation.getNetwork(1)->fitness = 1;
+
+    testPopulation.crossover();
+
+    // Figure out why there are 4 connection dummys per network instead of 2 
+
+    ASSERT_EQ(testPopulation.getNetwork(1)->connections->size(), 2);
+    ASSERT_EQ(testPopulation.getNetwork(1)->connections->at(1)->weight, 69);
 }

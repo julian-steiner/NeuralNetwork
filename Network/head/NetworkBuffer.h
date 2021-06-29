@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include "Layer.h"
+#include "CopyNetworkImpl.h"
 
 namespace nn
 {
@@ -33,6 +34,7 @@ namespace nn
         ~NetworkBuffer();
         NetworkBuffer(const NetworkBuffer& other);
         NetworkBuffer(NetworkBuffer&& other);
+        NetworkBuffer& operator=(const nn::NetworkBuffer& other);
 
         void addNeuron(neuron::Neuron&& neuron, int layerNumber);
         void addNeuron(neuron::NeuronType type, neuron::Activation activation, int layerNumber);

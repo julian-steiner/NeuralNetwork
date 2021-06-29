@@ -83,6 +83,9 @@ namespace connection
     };
 }
 
-bool operator==(const connection::NeuronLocation& first, const connection::NeuronLocation& second);
+bool operator==(const connection::ConnectionDummy& first, const connection::ConnectionDummy& second);
+bool operator==(const connection::Connection& first, const connection::Connection& second);
+bool operator!=(const connection::ConnectionDummy& first, const connection::ConnectionDummy& second);
+bool operator!=(const connection::Connection& first, const connection::Connection& second);
 
 #endif

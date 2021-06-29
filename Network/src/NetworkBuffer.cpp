@@ -41,66 +41,7 @@ NetworkBuffer::~NetworkBuffer()
 
 NetworkBuffer::NetworkBuffer(const NetworkBuffer& other)
 {
-    // assign pointers to the vectors
-    this->connections = new std::vector<connection::Connection*>();
-    this->neurons = new std::vector<neuron::Neuron*>();
-    this->layers = new std::vector<nn::Layer*>();
-    
-    // reserve space in the vectors
-    this->layers->reserve(other.layers->size());
-    this->neurons->reserve(other.neurons->size());
-    this->connections->reserve(other.connections->size());
-
-    for (nn::Layer* currentLayer : *other.layers)
-    {
-        // Add the layers
-        switch(currentLayer->layerType)
-        {
-            case(nn::LayerType::Input):
-                this->layers->emplace_back(new nn::InputLayer(currentLayer->getSize(), currentLayer->activation, currentLayer->layerConnectionType));
-                this->inputLayer = (nn::InputLayer*)this->layers->back();
-                break;
-
-            case(nn::LayerType::Output):
-                this->layers->emplace_back(new nn::OutputLayer(currentLayer->getSize(), currentLayer->activation, currentLayer->layerConnectionType));
-                this->outputLayer = (nn::OutputLayer*)this->layers->back();
-                break;
-
-            case(nn::LayerType::Hidden):
-                this->layers->emplace_back(new nn::HiddenLayer(currentLayer->getSize(), currentLayer->activation, currentLayer->layerConnectionType));
-                break;
-
-            case(nn::LayerType::CustomConnectedHidden):
-                this->layers->emplace_back(new nn::CustomConnectedHiddenLayer(currentLayer->getSize(), currentLayer->activation, currentLayer->layerConnectionType));
-                break;
-        }
-
-        // reserve space in the vectors
-        this->layers->back()->neurons.reserve(currentLayer->neurons.size()); 
-
-        // Copy all the layer parameters to the new layer
-        this->layers->back()->connectionDummys = currentLayer->connectionDummys;
-
-        // Add the neurons
-        for (neuron::Neuron* currentNeuron : currentLayer->neurons)
-        {
-            this->addNeuron(currentNeuron->type, currentNeuron->activation, currentNeuron->layerNumber, currentNeuron->bias);
-        }
-    }
-
-    // Add the connections (here because otherwise you get nullptrs)
-    for (nn::Layer* currentLayer : *other.layers)
-    {
-        // Add the connections
-        for (connection::ConnectionDummy currentConnectionDummy : currentLayer->connectionDummys)
-        {
-            this->connect(currentConnectionDummy.inNeuronLocation, currentConnectionDummy.outNeuronLocation);
-        }
-    }
-
-    // Setting other important parameters
-    this->previousLayerSize = other.previousLayerSize;
-    this->currentLayerNumber = other.currentLayerNumber;
+    nn::copyNetwork(this, &other);
 }
 
 NetworkBuffer::NetworkBuffer(NetworkBuffer&& other)
@@ -118,6 +59,16 @@ NetworkBuffer::NetworkBuffer(NetworkBuffer&& other)
     other.connections = nullptr;
     other.neurons = nullptr;
     other.neurons = nullptr;
+}
+
+NetworkBuffer& NetworkBuffer::operator=(const NetworkBuffer& other)
+{
+    if(&other!=this)
+    {
+        nn::copyNetwork(this, &other);
+    }
+
+    return *this;
 }
 
 void NetworkBuffer::addConnection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber, connection::NeuronLocation inNeuronLocation, connection::NeuronLocation outNeuronLocation)
@@ -250,63 +201,7 @@ T nn::NetworkBuffer::getCopy()
 {
     T tempNetworkBuffer;
 
-    // reserve space in the vectors
-    tempNetworkBuffer.layers->reserve(this->layers->size());
-    tempNetworkBuffer.neurons->reserve(this->neurons->size());
-    tempNetworkBuffer.connections->reserve(connections->size());
-
-    // Add every layer
-    for (nn::Layer* currentLayer : *this->layers)
-    {
-        // Add the layers
-        switch(currentLayer->layerType)
-        {
-            case(nn::LayerType::Input):
-                tempNetworkBuffer.layers->emplace_back(new nn::InputLayer(currentLayer->getSize(), currentLayer->activation, currentLayer->layerConnectionType));
-                tempNetworkBuffer.inputLayer = (nn::InputLayer*)tempNetworkBuffer.layers->back();
-                break;
-
-            case(nn::LayerType::Output):
-                tempNetworkBuffer.layers->emplace_back(new nn::OutputLayer(currentLayer->getSize(), currentLayer->activation, currentLayer->layerConnectionType));
-                tempNetworkBuffer.outputLayer = (nn::OutputLayer*)tempNetworkBuffer.layers->back();
-                break;
-
-            case(nn::LayerType::Hidden):
-                tempNetworkBuffer.layers->emplace_back(new nn::HiddenLayer(currentLayer->getSize(), currentLayer->activation, currentLayer->layerConnectionType));
-                break;
-
-            case(nn::LayerType::CustomConnectedHidden):
-                tempNetworkBuffer.layers->emplace_back(new nn::CustomConnectedHiddenLayer(currentLayer->getSize(), currentLayer->activation, currentLayer->layerConnectionType));
-                break;
-        }
-
-        // reserve space in the vectors
-        tempNetworkBuffer.layers->back()->neurons.reserve(currentLayer->neurons.size()); 
-
-
-        // Copy all the layer parameters to the new layer
-        tempNetworkBuffer.layers->back()->connectionDummys = currentLayer->connectionDummys;
-
-        // Add the neurons
-        for (neuron::Neuron* currentNeuron : currentLayer->neurons)
-        {
-            tempNetworkBuffer.addNeuron(currentNeuron->type, currentNeuron->activation, currentNeuron->layerNumber, currentNeuron->bias);
-        }
-    }
-
-    // Add the connections (here because otherwise you get nullptrs)
-    for (nn::Layer* currentLayer : *this->layers)
-    {
-        // Add the connections
-        for (connection::ConnectionDummy currentConnectionDummy : currentLayer->connectionDummys)
-        {
-            tempNetworkBuffer.connect(currentConnectionDummy.inNeuronLocation, currentConnectionDummy.outNeuronLocation, currentConnectionDummy.innovationNumber);
-        }
-    }
-
-    // Setting other important parameters
-    tempNetworkBuffer.previousLayerSize = this->previousLayerSize;
-    tempNetworkBuffer.currentLayerNumber = this->currentLayerNumber;
+    nn::copyNetwork(&tempNetworkBuffer, this);
 
     return std::move(tempNetworkBuffer);
 }

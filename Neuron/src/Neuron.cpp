@@ -246,3 +246,18 @@ bool operator==(const connection::NeuronLocation& first, const connection::Neuro
 {
     return first.layer == second.layer && first.number == second.number;
 }
+
+bool operator!=(const connection::NeuronLocation& first, const connection::NeuronLocation& second)
+{
+    return first.layer != second.layer || first.number != second.number;
+}
+
+bool operator==(const connection::Connection& first, const connection::Connection& second)
+{
+    return first.inNeuronLocation == second.inNeuronLocation && first.outNeuronLocation == second.outNeuronLocation;
+}
+
+bool operator!=(const connection::Connection& first, const connection::Connection& second)
+{
+    return first.inNeuronLocation != second.inNeuronLocation || first.outNeuronLocation != second.outNeuronLocation;
+}

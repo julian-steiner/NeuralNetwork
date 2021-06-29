@@ -98,6 +98,88 @@ void Population::mutate()
     }
 }
 
+void Population::crossover()
+{
+    std::vector<nn::NeuralNetwork*> matingPool = std::vector<nn::NeuralNetwork*>();
+    std::vector<nn::NeuralNetwork> nextGeneration = std::vector<nn::NeuralNetwork>();
+    matingPool.reserve(getSize());
+    nextGeneration.reserve(getSize());
+
+    double totalFitness = getTotalFitness();
+
+    for (nn::NeuralNetwork& currentNetwork : this->networks)
+    {
+        for (int i = 0; i < (int)round((currentNetwork.fitness / totalFitness) * getSize()); i++)
+        {
+            matingPool.push_back(&currentNetwork);
+        }
+    }
+
+    for (int i = 0; i < getSize(); i++)
+    {
+        double randomNumber1 = round((std::rand() / (double)RAND_MAX) * (getSize()-1));
+        double randomNumber2 = round((std::rand() / (double)RAND_MAX) * (getSize()-1));
+
+        nextGeneration.push_back(getChild(&this->networks.at(randomNumber1), &this->networks.at(randomNumber2)));
+    }
+
+    networks = nextGeneration;
+}
+
+nn::NeuralNetwork Population::getChild(nn::NeuralNetwork* network1, nn::NeuralNetwork* network2)
+{
+    nn::NeuralNetwork* higher;
+    nn::NeuralNetwork* lower;
+
+    if (network1->fitness >= network2->fitness)
+    {
+        higher = network1;
+        lower = network2;
+    }
+    
+    else
+    {
+        higher = network2;
+        lower = network1;
+    }
+
+    nn::NeuralNetwork tempNetwork = higher->getCopy<nn::NeuralNetwork>();
+
+    for (connection::Connection* currentConnection : *higher->connections)
+    {
+        for (connection::Connection* currentMatching : *lower->connections)
+        {
+            if (currentMatching->innovationNumber = currentConnection->innovationNumber)
+            {
+                double randomNumber = std::rand() / (double)RAND_MAX;
+                if (randomNumber >= 0.5)
+                {
+                    currentConnection->weight = currentMatching->weight;
+                }
+            }
+        }
+    }
+
+    std::cout << tempNetwork.connections->size() << std::endl;
+
+    return std::move(tempNetwork);
+}
+
+int Population::getSize()
+{
+    return this->networks.size();
+}
+
+double Population::getTotalFitness()
+{
+    double totalFitness = 0;
+    for (int i = 0; i < getSize(); i++)
+    {
+        totalFitness += getNetwork(i)->fitness;
+    }
+    return totalFitness;
+}
+
 void Population::weightMutate(connection::Connection* target)
 {
     target->weight += std::rand() / RAND_MAX * 2 - 1;
