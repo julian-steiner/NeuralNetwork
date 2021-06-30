@@ -42,66 +42,58 @@ void Population::mutate()
 {
     double randomNumber;
 
-    for(int j = 0; j < this->networks->size(); j++)
+    for(int i = 0; i < this->networks->size(); i++)
     {
-        nn::NeuralNetwork* currentNeuralNetwork = getNetwork(j);
-        // handle all the mutations based on a connection
-        for(int k = 0; k < currentNeuralNetwork->connections->size(); k++)
-        {
-            connection::Connection* currentConnection = currentNeuralNetwork->connections->at(k);
-            randomNumber = std::rand() / (double)RAND_MAX;
+        nn::NeuralNetwork* currentNeuralNetwork = getNetwork(i);
 
-            if (randomNumber < mutationRate)
-            {
-                weightMutate(currentConnection);
-            }
+        // handle changing of a weight
+        randomNumber = std::rand() /  (double)RAND_MAX;
+        if (randomNumber < mutationRate)
+        {
+            randomNumber = round(std::rand() / (double)RAND_MAX * currentNeuralNetwork->connections->size());
+            weightMutate(currentNeuralNetwork->connections->at(randomNumber));
         }
 
-        // handle the addition of a connection
-        for (int i = 0; i < 2; i++)
+        // handle connecting 2 neurons or inserting a node into a connection
+        randomNumber = std::rand() /  (double)RAND_MAX;
+        if (randomNumber < structuralMutationRate)
         {
-            nn::Layer* currentLayer = currentNeuralNetwork->layers->at(i);
-
-            int currentLayerSize = currentLayer->getSize();
-
-            for (int a = 0; a < currentLayerSize; a++)
+            // the -1 making sure that only layers 0 and 1 can be the origin of the connection
+            int randomInLayerNumber = round(std::rand() / (double)RAND_MAX * (currentNeuralNetwork->layers->size()-2));
+            if(currentNeuralNetwork->layers->at(randomInLayerNumber)->neurons.size() == 0)
             {
-                neuron::Neuron* currentNeuron = currentLayer->neurons.at(a);
+                randomInLayerNumber --;
+            }
+            int randomInNeuronNumber = round(std::rand() / (double)RAND_MAX * (currentNeuralNetwork->layers->at(randomInLayerNumber)->neurons.size()-1));
+            neuron::Neuron* inNeuron = currentNeuralNetwork->layers->at(randomInLayerNumber)->neurons.at(randomInNeuronNumber);
 
-                randomNumber = std::rand() / (double)RAND_MAX;
+            // the +1 making sure that only layers 1 and 2 can be the output of the connection
+            int randomOutLayerNumber = round(std::rand() / (double)RAND_MAX * (currentNeuralNetwork->layers->size()-2) + 1);
+            if(currentNeuralNetwork->layers->at(randomOutLayerNumber)->neurons.size() == 0)
+            {
+                randomOutLayerNumber ++;
+            }
+            int randomOutNeuronNumber = round(std::rand() / (double)RAND_MAX * (currentNeuralNetwork->layers->at(randomOutLayerNumber)->neurons.size()-1));
+            neuron::Neuron* outNeuron = currentNeuralNetwork->layers->at(randomOutLayerNumber)->neurons.at(randomOutNeuronNumber);
 
-                if (randomNumber < structuralMutationRate)
+
+            // check if the neuron is connected already
+            bool alreadyConnected = false;
+            for (int a = 0; a < inNeuron->connections_forward.size(); a++)
+            {
+                connection::Connection* currentConnection = inNeuron->connections_forward.at(a);
+                if (currentConnection->outNeuronLocation.layer == randomOutLayerNumber && currentConnection->outNeuronLocation.number == randomOutNeuronNumber)
                 {
-                    // get a random layer number and select a random neuron out of this layer
-                    int randomLayerNumber = (int) ((std::rand() / (double)RAND_MAX)>0.5) + 1;
-                    
-                    int randomNeuronNumber = (std::rand() / (double)RAND_MAX * currentNeuralNetwork->layers->at(randomLayerNumber)->getSize() - 1);
-
-                    // if the layer is empty, go to the next layer
-                    if (randomNeuronNumber == -1)
-                    {
-                        randomLayerNumber ++;
-                        randomNeuronNumber = (std::rand() / (double)RAND_MAX * currentNeuralNetwork->layers->at(randomLayerNumber)->getSize()) - 1;
-                    }
-
-                    bool alreadyConnected = false;
-                    
-                    // check if the neuron is connected already
-                    for (int o = 0; o < currentNeuron->connections_forward.size(); o++)
-                    {
-                        connection::Connection* currentConnection = currentNeuron->connections_forward.at(o);
-                        if (currentConnection->outNeuronLocation.layer == randomLayerNumber && currentConnection->outNeuronLocation.number == randomNeuronNumber)
-                        {
-                            addNeuron(currentNeuralNetwork, currentConnection);
-                            alreadyConnected = true;
-                        }
-                    }
-
-                    if (alreadyConnected == false && (i != randomLayerNumber || a != randomNeuronNumber) && !currentNeuralNetwork->checkForRecursion({i, a}, {randomLayerNumber, randomNeuronNumber}))
-                    {
-                        addConnection(currentNeuralNetwork, {i, a}, {randomLayerNumber, randomNeuronNumber});
-                    }
+                    // Add a node to the connection if it is already connected
+                    addNeuron(currentNeuralNetwork, currentConnection);
+                    alreadyConnected = true;
                 }
+            }
+
+            // add a connection if it isn't already connected or it would cause recursion
+            if (alreadyConnected == false && ((randomInLayerNumber != randomOutLayerNumber) || (randomInNeuronNumber != randomOutNeuronNumber)) && !currentNeuralNetwork->checkForRecursion({randomInLayerNumber, randomInNeuronNumber}, {randomOutLayerNumber, randomOutNeuronNumber}))
+            {
+                addConnection(currentNeuralNetwork, {randomInLayerNumber, randomInNeuronNumber}, {randomOutLayerNumber, randomOutNeuronNumber});
             }
         }
     }
