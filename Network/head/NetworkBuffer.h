@@ -46,7 +46,6 @@ namespace nn
 
         template<typename T>
         T getCopy();
-    
     };
 }
 

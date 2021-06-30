@@ -193,7 +193,7 @@ bool nn::NetworkBuffer::RecursivelyCheckForRecursion(neuron::Neuron* currentNeur
 
 bool nn::NetworkBuffer::checkForRecursion(connection::NeuronLocation inNeuronLocation, connection::NeuronLocation outNeuronLocation)
 {
-    return RecursivelyCheckForRecursion(this->layers->at(outNeuronLocation.layer)->neurons.at(outNeuronLocation.number), this->layers->at(inNeuronLocation.layer)->neurons.at(inNeuronLocation.number));
+    return RecursivelyCheckForRecursion(this->layers->at(inNeuronLocation.layer)->neurons.at(inNeuronLocation.number), this->layers->at(outNeuronLocation.layer)->neurons.at(outNeuronLocation.number));
 }
 
 template<typename T>

@@ -32,8 +32,9 @@ std::vector<double> nn::NeuralNetwork::predict(std::vector<double> inputs)
     result.reserve(this->previousLayerSize);
 
     // feedforward
-    for (neuron::Neuron* c_neuron : this->outputLayer->neurons)
+    for (int i = 0; i < this->outputLayer->neurons.size(); i++)
     {
+        neuron::Neuron* c_neuron = this->outputLayer->neurons.at(i);
         result.push_back(c_neuron->recursiveCalculate());
     }
 

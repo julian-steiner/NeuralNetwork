@@ -196,8 +196,17 @@ double Neuron::recursiveCalculate()
                 this->value = 0;
 
                 // calculate the sum
-                for (connection::Connection* connection : this->connections_back)
+                //for (connection::Connection* connection : this->connections_back)
+                //{
+                    //if (connection->enabled)
+                    //{
+                        //this->value += connection->in->recursiveCalculate() * connection->weight;
+                    //}
+                //}
+
+                for (int i = 0; i < this->connections_back.size(); i++)
                 {
+                    connection::Connection* connection = this->connections_back.at(i);
                     if (connection->enabled)
                     {
                         this->value += connection->in->recursiveCalculate() * connection->weight;

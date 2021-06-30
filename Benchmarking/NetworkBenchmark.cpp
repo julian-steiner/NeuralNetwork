@@ -1,60 +1,109 @@
-#include "NeuralNetwork.h"
+#include "Population.h"
 #include "Profiler.h"
 #include "Timer.h"
 #include "Timer.h"
 
 int main()
 {
-    profiling::Instrumentor::Get().BeginSession("Benchmarking");
+    nn::NeuralNetwork templateNetwork;
+    templateNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    templateNetwork.addLayer(0, neuron::Activation::Sigmoid, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
+    templateNetwork.addLayer(1, neuron::Activation::Sigmoid, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
+    templateNetwork.connect({0, 0}, {2, 0});
+    templateNetwork.connect({0, 1}, {2, 0});
 
-    PROFILE_SCOPE("Main");
-    nn::NeuralNetwork network;
+    population::Population testPopulation(1000, &templateNetwork);
+
+    testPopulation.mutationRate = 0.2;
+    testPopulation.structuralMutationRate = 0.001;
+    testPopulation.learningRate = 0.1;
+    nn::NeuralNetwork* fittest;
+
+    int generation = 0; 
+    int counter = 0;
+    double highestFitness = 0;
+
+    int numberOfGenerations = 2000;
+
+    while (generation <= numberOfGenerations)
     {
-        std::vector<double> inputs;
-        std::vector<double> results;
-        int size;
-        int capacity;
-
+        testPopulation.mutate();
+        
+        double totalFitness = 0;
+        for (int i = 0; i < 100; i++)
         {
-            PROFILE_SCOPE("CreateNetwork");
+            nn::NeuralNetwork* currentNetwork = testPopulation.getNetwork(i);
 
-            network.addLayer(284, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+            double error = 0; 
+            double result = 0;
 
-            for (int i = 0; i < 0; i++)
+            result = currentNetwork->predict({1, 1}).at(0);
+            error += pow(result - 0, 2);
+            result = currentNetwork->predict({0, 0}).at(0);
+            error += pow(result - 0, 2);
+            result = currentNetwork->predict({1, 0}).at(0);
+            error += pow(result - 1, 2);
+            result = currentNetwork->predict({0, 1}).at(0);
+            error += pow(result - 1, 2);
+
+            currentNetwork->fitness = 4 - error;
+
+            if (currentNetwork->fitness > highestFitness)
             {
-                network.addLayer(284, neuron::Activation::Sigmoid, nn::LayerType::Hidden, nn::LayerConnectionType::FullyConnected);
+                highestFitness = currentNetwork->fitness;
+                fittest = currentNetwork;
             }
-            network.addLayer(16, neuron::Activation::Sigmoid, nn::LayerType::Hidden, nn::LayerConnectionType::FullyConnected);
-            network.addLayer(16, neuron::Activation::Sigmoid, nn::LayerType::Hidden, nn::LayerConnectionType::FullyConnected);
-            network.addLayer(9, neuron::Activation::Sigmoid, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
 
-            std::cout << network.connections->size() << std::endl; 
-            std::cout << network.neurons->size() << std::endl;
+            totalFitness += currentNetwork->fitness;
         }
 
+        if(counter == 100)
         {
-            PROFILE_SCOPE("CreateVector");
-            inputs.reserve(284);
-            for (int i = 0; i < 284; i++)
-            {
-                inputs.push_back(i);
-            }
+            std::cout << "Total Fitness: " << totalFitness << "     Generation: " << generation << "    Fittest: " << highestFitness << std::endl;
+            counter = 0;
+        }
+        counter ++;
+
+        generation++;
+
+        highestFitness = 0;
+
+        if(generation < numberOfGenerations)
+        {
+            testPopulation.crossover();
         }
 
-        {
-            PROFILE_SCOPE("FeedForward");
-            results = network.predict(inputs);
-        }
-
-        {
-            PROFILE_SCOPE("PrintResults");
-            for (double value : results)
-            {
-                std::cout << value << ", ";
-            }
-            std::cout << std::endl;
-        }
     }
 
-    profiling::Instrumentor::Get().EndSession();
+    std::cout << "Fittest Number of connections: " << fittest->connections->size() << std::endl;
+    std::cout << "Fittest Number of neurons: " << fittest->layers->at(1)->neurons.size() << std::endl;
+    std::cout << "Fitness of fittest: " << fittest->fitness << std::endl;
+
+    std::vector<nn::Layer*> layers;
+    for (int i = 0; i < fittest->layers->size(); i++)
+    {
+        layers.push_back(fittest->layers->at(i));
+    }
+    std::cin.get();
+
+    double result = fittest->predict({1, 1}).at(0);
+    std::cout << "With {1, 1}: " << result << std::endl;
+    double error = pow(result - 0, 2.0);
+
+    result = fittest->predict({0, 0}).at(0);
+    std::cout << "With {0, 0}: " << result << std::endl;
+    error += pow(result - 0, 2.0);
+
+    result = fittest->predict({1, 0}).at(0);
+    std::cout << "With {1, 0}: " << result << std::endl;
+    error += pow(result - 1, 2.0);
+    
+    result = fittest->predict({0, 1}).at(0);
+    std::cout << "With {0, 1}: " << result << std::endl;
+    error += pow(result - 1, 2.0);
+
+    fittest->fitness = 4.0 - error;
+
+    std::cout << "Error: " << error << std::endl;
+    std::cout << fittest->fitness << std::endl;
 }

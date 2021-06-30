@@ -97,6 +97,7 @@ TEST(NetworkBuffer, BufferCopiedCorrectly)
     nn::NetworkBuffer testNetwork2 = testNetwork.getCopy<nn::NetworkBuffer>();
 
     ASSERT_EQ(testNetwork2.connections->size(), testNetwork.connections->size());
+    ASSERT_EQ(testNetwork2.layers->at(0)->neurons.size(), 10);
     ASSERT_EQ(testNetwork2.neurons->at(0)->connections_forward.size(), testNetwork.neurons->at(0)->connections_forward.size());
     ASSERT_EQ(testNetwork2.neurons->at(15)->connections_back.size(), testNetwork.neurons->at(15)->connections_back.size());
     ASSERT_EQ(testNetwork2.neurons->at(31)->connections_forward.size(), testNetwork.neurons->at(31)->connections_forward.size());
@@ -143,11 +144,13 @@ TEST(NetworkBuffer, RecursionTestCorrectly)
     testNetworkBuffer1.addLayer(1, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
     testNetworkBuffer1.addLayer(1, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
 
-    ASSERT_EQ(testNetworkBuffer1.checkForRecursion({0, 0}, {2, 0}), true);
+    ASSERT_EQ(testNetworkBuffer1.connections->size(), 2);
+    ASSERT_EQ(testNetworkBuffer1.checkForRecursion({1, 0}, {0, 0}), true);
+    ASSERT_EQ(testNetworkBuffer1.checkForRecursion({2, 0}, {0, 0}), true);
 
-    testNetworkBuffer1.addNeuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, 2);
+    testNetworkBuffer1.addNeuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, 1);
 
-    ASSERT_EQ(false, testNetworkBuffer1.checkForRecursion({0, 0}, {2, 1}));
+    ASSERT_EQ(false, testNetworkBuffer1.checkForRecursion({0, 0}, {1, 1}));
 }
 
 TEST(NeuralNetwork, NetworkInheritanceWorkingCorrectly)
