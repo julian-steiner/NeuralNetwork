@@ -8,14 +8,16 @@ int main()
     nn::NeuralNetwork templateNetwork;
     templateNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
     templateNetwork.addLayer(0, neuron::Activation::Sigmoid, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
+    //templateNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Hidden, nn::LayerConnectionType::FullyConnected);
     templateNetwork.addLayer(1, neuron::Activation::Sigmoid, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
-    templateNetwork.connect({0, 0}, {2, 0});
-    templateNetwork.connect({0, 1}, {2, 0});
+    //templateNetwork.connect({0, 0}, {2, 0});
+    //templateNetwork.connect({0, 1}, {2, 0});
 
-    population::Population testPopulation(1000, &templateNetwork);
+    int numberOfNetworks = 100;
+    population::Population testPopulation(numberOfNetworks, &templateNetwork);
 
-    testPopulation.mutationRate = 0.2;
-    testPopulation.structuralMutationRate = 0.001;
+    testPopulation.mutationRate = 0.02;
+    testPopulation.structuralMutationRate = 0.005;
     testPopulation.learningRate = 0.1;
     nn::NeuralNetwork* fittest;
 
@@ -23,14 +25,14 @@ int main()
     int counter = 0;
     double highestFitness = 0;
 
-    int numberOfGenerations = 2000;
+    int numberOfGenerations = 5000;
 
     while (generation <= numberOfGenerations)
     {
         testPopulation.mutate();
         
         double totalFitness = 0;
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < numberOfNetworks; i++)
         {
             nn::NeuralNetwork* currentNetwork = testPopulation.getNetwork(i);
 
@@ -38,13 +40,13 @@ int main()
             double result = 0;
 
             result = currentNetwork->predict({1, 1}).at(0);
-            error += pow(result - 0, 2);
+            error += pow(pow(result - 0, 2), 0.5);
             result = currentNetwork->predict({0, 0}).at(0);
-            error += pow(result - 0, 2);
+            error += pow(pow(result - 0, 2), 0.5);
             result = currentNetwork->predict({1, 0}).at(0);
-            error += pow(result - 1, 2);
+            error += pow(pow(result - 1, 2), 0.5);
             result = currentNetwork->predict({0, 1}).at(0);
-            error += pow(result - 1, 2);
+            error += pow(pow(result - 1, 2), 0.5);
 
             currentNetwork->fitness = 4 - error;
 

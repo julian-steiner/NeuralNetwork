@@ -26,6 +26,7 @@ namespace population
         int getSize();
         double getTotalFitness();
         void weightMutate(connection::Connection* target);
+        void biasMutate(neuron::Neuron* target);
         void addConnection(nn::NeuralNetwork* targetNetwork, connection::NeuronLocation neuron1, connection::NeuronLocation neuron2);
         void addNeuron(nn::NeuralNetwork* targetNetwork, connection::Connection* target);
         std::vector<nn::NeuralNetwork>* networks;

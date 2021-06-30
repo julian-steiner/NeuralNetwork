@@ -50,8 +50,22 @@ void Population::mutate()
         randomNumber = std::rand() /  (double)RAND_MAX;
         if (randomNumber < mutationRate)
         {
-            randomNumber = round(std::rand() / (double)RAND_MAX * currentNeuralNetwork->connections->size());
-            weightMutate(currentNeuralNetwork->connections->at(randomNumber));
+            randomNumber = round(std::rand() / (double)RAND_MAX * currentNeuralNetwork->connections->size()-1);
+            if (randomNumber >= 0)
+            {
+                weightMutate(currentNeuralNetwork->connections->at(randomNumber));
+            }
+        }
+
+        // handle changing of a bias
+        randomNumber = std::rand() /  (double)RAND_MAX;
+        if (randomNumber < mutationRate)
+        {
+            randomNumber = round(std::rand() / (double)RAND_MAX * currentNeuralNetwork->neurons->size()-1);
+            if (randomNumber >= 0)
+            {
+                biasMutate(currentNeuralNetwork->neurons->at(randomNumber));
+            }
         }
 
         // handle connecting 2 neurons or inserting a node into a connection
@@ -124,6 +138,7 @@ void Population::crossover()
         nextGeneration->push_back(getChild(&this->networks->at(randomNumber1), &this->networks->at(randomNumber2)));
     }
 
+    delete networks;
     this->networks = nextGeneration;
 }
 
@@ -182,6 +197,11 @@ double Population::getTotalFitness()
 void Population::weightMutate(connection::Connection* target)
 {
     target->weight += (std::rand() / (double)RAND_MAX * 2 - 1) * learningRate;
+}
+
+void Population::biasMutate(neuron::Neuron* target)
+{
+    target->bias += (std::rand() / (double)RAND_MAX * 2 - 1) * learningRate;
 }
 
 void Population::addConnection(nn::NeuralNetwork* targetNetwork, connection::NeuronLocation neuron1, connection::NeuronLocation neuron2)
