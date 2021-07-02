@@ -5,12 +5,24 @@
 
 namespace population
 {
+    struct NetworkComparison
+    {
+        int matchingGenes;
+        int nonMatchingGenes;
+        double weightDifferences;
+        double differenceRatio;
+    };
+
     class Population
     {
         public:
-        double mutationRate = 1;
-        double structuralMutationRate = 1;
+        double weightChangingRate = 0;
+        double neuronAddingRate = 0;
+        double connectionAddingRate = 0;
         double learningRate = 1;
+        double nonMatchingGenesWeight = 1;
+        double weightDifferenceWeight = 0.5;
+        double numberOfSpecies = 1;
 
         Population(const int& size, nn::NeuralNetwork* templateNetwork);
         ~Population();
@@ -18,8 +30,10 @@ namespace population
         nn::NeuralNetwork* getNetwork(int number);
         int getCurrentInnovationNumber();
 
-        void crossover();
         void mutate();
+        population::NetworkComparison compareNetworks(nn::NeuralNetwork* first, nn::NeuralNetwork* second);
+        void speciate();
+        void crossover();
 
         private:
         nn::NeuralNetwork getChild(nn::NeuralNetwork* first, nn::NeuralNetwork* second);
@@ -30,6 +44,7 @@ namespace population
         void addConnection(nn::NeuralNetwork* targetNetwork, connection::NeuronLocation neuron1, connection::NeuronLocation neuron2);
         void addNeuron(nn::NeuralNetwork* targetNetwork, connection::Connection* target);
         std::vector<nn::NeuralNetwork>* networks;
+        std::vector<std::vector<nn::NeuralNetwork*>> species;
         int currentInnovationNumber;
     };
 }

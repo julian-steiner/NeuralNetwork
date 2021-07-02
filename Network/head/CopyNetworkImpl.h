@@ -52,6 +52,7 @@ namespace nn
         for (int i = 0; i < from->layers->size(); i++)
         {
             nn::Layer* currentLayer = from->layers->at(i);
+
             // Add the connections
             for (connection::ConnectionDummy currentConnectionDummy : currentLayer->connectionDummys)
             {
@@ -81,6 +82,7 @@ namespace nn
                     }
 
                     correspondingConnection->weight = currentConnection->weight;
+                    correspondingConnection->enabled = currentConnection->enabled;
                 }
             }
         }

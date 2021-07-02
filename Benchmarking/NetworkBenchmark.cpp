@@ -16,9 +16,10 @@ int main()
     int numberOfNetworks = 100;
     population::Population testPopulation(numberOfNetworks, &templateNetwork);
 
-    testPopulation.mutationRate = 0.02;
-    testPopulation.structuralMutationRate = 0.005;
-    testPopulation.learningRate = 0.1;
+    testPopulation.weightChangingRate = 1;
+    testPopulation.connectionAddingRate = 0.01;
+    testPopulation.neuronAddingRate = 0.01;
+    testPopulation.learningRate = 0.5;
     nn::NeuralNetwork* fittest;
 
     int generation = 0; 
@@ -86,7 +87,6 @@ int main()
     {
         layers.push_back(fittest->layers->at(i));
     }
-    std::cin.get();
 
     double result = fittest->predict({1, 1}).at(0);
     std::cout << "With {1, 1}: " << result << std::endl;
