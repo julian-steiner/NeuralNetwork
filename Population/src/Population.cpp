@@ -252,36 +252,21 @@ void Population::speciate()
     this->species.clear();
     this->species.reserve(numberOfSpecies);
 
-    double maxDifferenceRatio = 0; 
-
-    // determining the highest difference ratio
-    for(int i = 0; i < this->networks->size(); i++)
-    {
-        nn::NeuralNetwork* currentNetwork = &this->networks->at(i);
-        double differenceRatio = compareNetworks(&this->networks->at(0), &this->networks->at(i)).differenceRatio;
-
-        if (differenceRatio > maxDifferenceRatio) maxDifferenceRatio = differenceRatio;
-    }
-
-    // determining the speciation threshold
-    double speciationThreshold = maxDifferenceRatio / numberOfSpecies;
-
     // copying all the networkPointers into a vector for easier speciation
     std::vector<nn::NeuralNetwork*> networkPointers = std::vector<nn::NeuralNetwork*>();
     networkPointers.reserve(this->networks->size());
 
     for(int i = 0; i < this->networks->size(); i++)
     {
-        networkPointers.push_back(&this->networks->at(i));
+        networkPointers.push_back(getNetwork(i));
     }
-
-    //std::cout << maxDifferenceRatio << std::endl;
 
     // adding the networks to the different species
     for (int i = 0; i < numberOfSpecies; i++)
     {
         this->species.emplace_back(std::vector<nn::NeuralNetwork*>());
 
+        // end if there are no networks in the population
         if(networkPointers.size() == 0)
         {
             continue;
@@ -290,6 +275,9 @@ void Population::speciate()
         int randomNumber = round((std::rand() / (double)RAND_MAX) * (networkPointers.size()-1));
         nn::NeuralNetwork* populationPivot = networkPointers.at(randomNumber);
         networkPointers.erase(networkPointers.begin() + randomNumber);
+
+        double maxDifference = getMaxDifference(populationPivot);
+        double speciationThreshold = maxDifference / (numberOfSpecies - i);
 
         this->species.at(i).push_back(populationPivot);
 
@@ -307,4 +295,20 @@ void Population::speciate()
             pointerIt++;
         }
     }
+}
+
+double Population::getMaxDifference(nn::NeuralNetwork* reference)
+{
+    double maxDifferenceRatio = 0; 
+
+    // determining the highest difference ratio
+    for(int i = 0; i < this->networks->size(); i++)
+    {
+        nn::NeuralNetwork* currentNetwork = &this->networks->at(i);
+        double differenceRatio = compareNetworks(reference, &this->networks->at(i)).differenceRatio;
+
+        if (differenceRatio > maxDifferenceRatio) maxDifferenceRatio = differenceRatio;
+    }
+
+    return maxDifferenceRatio;
 }

@@ -39,6 +39,7 @@ namespace population
         nn::NeuralNetwork getChild(nn::NeuralNetwork* first, nn::NeuralNetwork* second);
         int getSize();
         double getTotalFitness();
+        double getMaxDifference(nn::NeuralNetwork* reference);
         void weightMutate(connection::Connection* target);
         void biasMutate(neuron::Neuron* target);
         void addConnection(nn::NeuralNetwork* targetNetwork, connection::NeuronLocation neuron1, connection::NeuronLocation neuron2);
