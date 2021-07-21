@@ -208,3 +208,58 @@ T nn::NetworkBuffer::getCopy()
 
 template nn::NetworkBuffer nn::NetworkBuffer::getCopy<nn::NetworkBuffer>();
 template nn::NeuralNetwork nn::NetworkBuffer::getCopy<nn::NeuralNetwork>();
+
+std::stringstream nn::NetworkBuffer::drawScheme(neuron::Neuron* targetNeuron)
+{
+    std::stringstream output;
+
+    if(targetNeuron->rewriteCache == true)
+    {
+        targetNeuron->rewriteCache = false;
+        output << targetNeuron;
+
+        if(targetNeuron->connections_forward.size() != 0)
+        {
+            if (targetNeuron->connections_forward.size() > 1) output << " -> {";
+            else output << " -> ";
+
+            for(int i = 0; i < targetNeuron->connections_forward.size(); i++)
+            {
+                connection::Connection* currentConnection = targetNeuron->connections_forward.at(i);
+                output << drawScheme(currentConnection->out).str();
+                if(i != targetNeuron->connections_forward.size() - 1)
+                {
+                    output << ", ";
+                }
+            }
+
+            if (targetNeuron->connections_forward.size() > 1) output << "}";
+        }
+    }
+
+    else
+    {
+        output << targetNeuron;
+    }
+
+    return output;
+}
+
+std::vector<std::string> nn::NetworkBuffer::getConnectionScheme()
+{
+    std::vector<std::string> output;
+
+    // Using the rewriteCache variable to see if it has already been iterated over
+    for(int i = 0; i < this->neurons->size(); i++)
+    {
+        this->neurons->at(i)->rewriteCache = true;
+    }
+
+    for(int i = 0; i < this->inputLayer->neurons.size(); i++)
+    {
+        neuron::Neuron* currentNeuron = this->inputLayer->neurons.at(i);
+        output.push_back(drawScheme(currentNeuron).str());
+    }
+
+    return output;
+}

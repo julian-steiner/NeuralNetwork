@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <memory>
+#include <string>
+#include <sstream>
 #include "Layer.h"
 #include "CopyNetworkImpl.h"
 
@@ -43,6 +45,9 @@ namespace nn
         bool checkForRecursion(connection::NeuronLocation inNeuronNumber, connection::NeuronLocation outNeuronNumber);
 
         void addLayer(int numNeurons, neuron::Activation activation, LayerType layerType, LayerConnectionType connectionType);
+
+        std::stringstream drawScheme(neuron::Neuron* targetNeuron);
+        std::vector<std::string> getConnectionScheme();
 
         template<typename T>
         T getCopy();

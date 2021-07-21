@@ -153,6 +153,32 @@ TEST(NetworkBuffer, RecursionTestCorrectly)
     ASSERT_EQ(false, testNetworkBuffer1.checkForRecursion({0, 0}, {1, 1}));
 }
 
+TEST(NetworkBuffer, PrintingCorrectly)
+{
+    nn::NetworkBuffer testNetworkBuffer;
+
+    testNetworkBuffer.addLayer(2, neuron::Activation::None, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetworkBuffer.addLayer(3, neuron::Activation::None, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
+    testNetworkBuffer.addLayer(2, neuron::Activation::None, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
+    testNetworkBuffer.addLayer(2, neuron::Activation::None, nn::LayerType::Output, nn::LayerConnectionType::CustomConnected);
+
+    testNetworkBuffer.connect({0, 0}, {1, 0});
+    testNetworkBuffer.connect({0, 0}, {1, 1});
+    testNetworkBuffer.connect({0, 0}, {1, 2});
+    testNetworkBuffer.connect({0, 1}, {1, 0});
+    testNetworkBuffer.connect({0, 1}, {1, 2});
+
+    testNetworkBuffer.connect({1, 0}, {2, 0});
+    testNetworkBuffer.connect({1, 1}, {2, 1});
+    testNetworkBuffer.connect({1, 2}, {2, 1});
+
+    testNetworkBuffer.connect({2, 0}, {3, 0});
+    testNetworkBuffer.connect({2, 0}, {3, 1});
+    testNetworkBuffer.connect({2, 1}, {3, 1});
+
+    std::vector<std::string> scheme = testNetworkBuffer.getConnectionScheme();
+}
+
 TEST(NeuralNetwork, NetworkInheritanceWorkingCorrectly)
 {
     nn::NeuralNetwork testNetwork; 
