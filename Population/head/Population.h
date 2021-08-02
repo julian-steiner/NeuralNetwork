@@ -13,6 +13,13 @@ namespace population
         double differenceRatio;
     };
 
+    struct Species
+    {
+        std::vector<nn::NeuralNetwork*> networks;
+        double totalFitness;
+        int numChildrenAllowed;
+    };
+
     class Population
     {
         public:
@@ -22,17 +29,24 @@ namespace population
         double learningRate = 1;
         double nonMatchingGenesWeight = 1;
         double weightDifferenceWeight = 0.5;
-        double numberOfSpecies = 1;
+        
+        double targetNumberOfSpecies = 1;
+        double speciationThreshold;
 
         Population(const int& size, nn::NeuralNetwork* templateNetwork);
         ~Population();
         nn::NeuralNetwork& getNetwork(const int& number);
         const int& getCurrentInnovationNumber();
 
+        int getNumberOfSpecies();
+
         double compareNetworks(nn::NeuralNetwork* network1, nn::NeuralNetwork* network2);
+        void speciate();
 
         private:
         std::vector<nn::NeuralNetwork>* networks;
+        std::vector<Species> species;
+
         int currentInnovationNumber;
     };
 }

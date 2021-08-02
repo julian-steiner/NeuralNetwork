@@ -44,6 +44,11 @@ const int& Population::getCurrentInnovationNumber()
     return currentInnovationNumber;
 }
 
+int Population::getNumberOfSpecies()
+{
+    return species.size();
+}
+
 double Population::compareNetworks(nn::NeuralNetwork* network1, nn::NeuralNetwork* network2)
 {
     double differenceRatio = 0;
@@ -73,4 +78,44 @@ double Population::compareNetworks(nn::NeuralNetwork* network1, nn::NeuralNetwor
     differenceRatio += (size1 - matchingGenes) + (size2 - matchingGenes) + weightDifference;
 
     return differenceRatio;
+}
+
+void Population::speciate()
+{
+    species.clear();
+    // Copying all the pointers of the networks
+    std::vector<nn::NeuralNetwork*> networksCopy;
+    networksCopy.reserve(networks->size());
+    for(int i = 0; i < networks->size(); i++)
+    {
+        networksCopy.push_back(&networks->at(i));
+    }
+
+    // Speciating till all networks have their species
+    while(networksCopy.size() > 0)
+    {
+        // Selecting 1 at random and comparing all to it
+        int randomNumber = (std::rand() / (double)RAND_MAX) * (networksCopy.size() - 1);
+        std::cout << randomNumber << std::endl;
+        std::vector<nn::NeuralNetwork*>::iterator randomNetworkIt = networksCopy.begin() + randomNumber;
+
+        species.emplace_back(Species());
+        species.back().networks.push_back(*randomNetworkIt);
+
+        std::vector<nn::NeuralNetwork*>::iterator it = networksCopy.begin();
+
+        while(*it != networksCopy.back())
+        {
+            if (compareNetworks(*randomNetworkIt, *it) <= speciationThreshold)
+            {
+                species.back().networks.push_back(*it);
+                networksCopy.erase(it);
+                it--;
+            }
+            it ++;
+        }
+
+        if(*randomNetworkIt == networksCopy.back()) networksCopy.pop_back();
+        else    networksCopy.erase(randomNetworkIt);
+    }
 }

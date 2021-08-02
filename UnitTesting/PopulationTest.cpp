@@ -49,3 +49,33 @@ TEST(Population, NetworksComparedCorrectly)
 
     ASSERT_EQ(difference, 321);
 }
+
+TEST(Population, SpeciatingCorrectly)
+{
+    nn::NeuralNetwork testNetwork;
+
+    testNetwork.addLayer(4, neuron::Activation::None, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(0, neuron::Activation::Sigmoid, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
+    testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
+
+    population::Population testPopulation(10, &testNetwork);
+    testPopulation.targetNumberOfSpecies = 3;
+    testPopulation.speciationThreshold = 1;
+
+    testPopulation.getNetwork(1).addNeuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, 1, 69);
+    testPopulation.getNetwork(1).connect({0, 0}, {1, 0}, 0);
+    testPopulation.getNetwork(1).connect({1, 0}, {2, 1}, 420);
+    testPopulation.getNetwork(1).connections->at(0)->weight = 320;
+    testPopulation.getNetwork(1).connections->at(1)->weight = 320;
+
+    testPopulation.speciate();
+
+    ASSERT_EQ(testPopulation.getNumberOfSpecies(), 2);
+
+    testPopulation.speciationThreshold = 2;
+
+    testPopulation.speciate();
+
+    ASSERT_EQ(testPopulation.getNumberOfSpecies(), 1);
+
+}
