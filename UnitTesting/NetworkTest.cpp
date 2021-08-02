@@ -177,6 +177,8 @@ TEST(NetworkBuffer, PrintingCorrectly)
     testNetworkBuffer.connect({2, 1}, {3, 1});
 
     std::vector<std::string> scheme = testNetworkBuffer.getConnectionScheme();
+
+    testNetworkBuffer.saveConnectionScheme("NetworkGraph.tex");
 }
 
 TEST(NeuralNetwork, NetworkInheritanceWorkingCorrectly)

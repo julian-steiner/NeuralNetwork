@@ -26,26 +26,13 @@ namespace population
 
         Population(const int& size, nn::NeuralNetwork* templateNetwork);
         ~Population();
+        nn::NeuralNetwork& getNetwork(const int& number);
+        const int& getCurrentInnovationNumber();
 
-        nn::NeuralNetwork* getNetwork(int number);
-        int getCurrentInnovationNumber();
-
-        void mutate();
-        population::NetworkComparison compareNetworks(nn::NeuralNetwork* first, nn::NeuralNetwork* second);
-        void speciate();
-        void crossover();
+        double compareNetworks(nn::NeuralNetwork* network1, nn::NeuralNetwork* network2);
 
         private:
-        nn::NeuralNetwork getChild(nn::NeuralNetwork* first, nn::NeuralNetwork* second);
-        int getSize();
-        double getTotalFitness();
-        double getMaxDifference(nn::NeuralNetwork* reference);
-        void weightMutate(connection::Connection* target);
-        void biasMutate(neuron::Neuron* target);
-        void addConnection(nn::NeuralNetwork* targetNetwork, connection::NeuronLocation neuron1, connection::NeuronLocation neuron2);
-        void addNeuron(nn::NeuralNetwork* targetNetwork, connection::Connection* target);
         std::vector<nn::NeuralNetwork>* networks;
-        std::vector<std::vector<nn::NeuralNetwork*>> species;
         int currentInnovationNumber;
     };
 }

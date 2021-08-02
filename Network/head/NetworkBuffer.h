@@ -5,6 +5,8 @@
 #include <memory>
 #include <string>
 #include <sstream>
+#include <fstream>
+#include <algorithm>
 #include "Layer.h"
 #include "CopyNetworkImpl.h"
 
@@ -20,6 +22,7 @@ namespace nn
     private:
         void addConnection(neuron::Neuron* in, neuron::Neuron* out, int innovationNumber=0, connection::NeuronLocation inNeuronLocation = {0, 0}, connection::NeuronLocation outNeuronLocation = {0, 0});
         bool RecursivelyCheckForRecursion(neuron::Neuron* currentNeuron, neuron::Neuron* targetNeuron);
+        std::stringstream drawScheme(neuron::Neuron* targetNeuron);
 
     public:
         int previousLayerSize;
@@ -46,8 +49,8 @@ namespace nn
 
         void addLayer(int numNeurons, neuron::Activation activation, LayerType layerType, LayerConnectionType connectionType);
 
-        std::stringstream drawScheme(neuron::Neuron* targetNeuron);
         std::vector<std::string> getConnectionScheme();
+        void saveConnectionScheme(const std::string& filename);
 
         template<typename T>
         T getCopy();

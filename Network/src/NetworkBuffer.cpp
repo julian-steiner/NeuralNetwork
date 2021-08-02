@@ -213,10 +213,13 @@ std::stringstream nn::NetworkBuffer::drawScheme(neuron::Neuron* targetNeuron)
 {
     std::stringstream output;
 
+    std::vector<neuron::Neuron*>::iterator it = std::find_if(neurons->begin(), neurons->end(), [targetNeuron](const neuron::Neuron* n){return n == targetNeuron;});
+    int distance = std::distance(neurons->begin(), it);
+
     if(targetNeuron->rewriteCache == true)
     {
         targetNeuron->rewriteCache = false;
-        output << targetNeuron;
+        output << distance;
 
         if(targetNeuron->connections_forward.size() != 0)
         {
@@ -226,10 +229,13 @@ std::stringstream nn::NetworkBuffer::drawScheme(neuron::Neuron* targetNeuron)
             for(int i = 0; i < targetNeuron->connections_forward.size(); i++)
             {
                 connection::Connection* currentConnection = targetNeuron->connections_forward.at(i);
-                output << drawScheme(currentConnection->out).str();
-                if(i != targetNeuron->connections_forward.size() - 1)
+                if (currentConnection->enabled)
                 {
-                    output << ", ";
+                    output << drawScheme(currentConnection->out).str();
+                    if(i != targetNeuron->connections_forward.size() - 1)
+                    {
+                        output << ", ";
+                    }
                 }
             }
 
@@ -239,7 +245,7 @@ std::stringstream nn::NetworkBuffer::drawScheme(neuron::Neuron* targetNeuron)
 
     else
     {
-        output << targetNeuron;
+        output << distance;
     }
 
     return output;
@@ -262,4 +268,35 @@ std::vector<std::string> nn::NetworkBuffer::getConnectionScheme()
     }
 
     return output;
+}
+
+void nn::NetworkBuffer::saveConnectionScheme(const std::string& filename)
+{
+    std::fstream document;
+    document.open(filename);
+
+    if (!document)
+    {
+        std::cout << "Error opening the document" << std::endl;
+    }
+
+    std::vector<std::string> connectionScheme = getConnectionScheme();
+
+    document << "\\documentclass{standalone}" << std::endl;
+    document << "\\usepackage{tikz}" << std::endl;
+    document << "\\usetikzlibrary {graphs}" << std::endl;
+    document << "\\begin{document}" << std::endl;
+    document << "\\tikz \\graph {" << std::endl;
+
+    for (const std::string& str : connectionScheme)
+    {
+        document << str << ";" << std::endl;
+    }
+
+    std::cin.get();
+
+    document << "};" << std::endl;
+    document << "\\end{document}" << std::endl;
+
+    document.close();
 }
