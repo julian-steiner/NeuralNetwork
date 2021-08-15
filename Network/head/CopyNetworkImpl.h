@@ -83,6 +83,7 @@ namespace nn
 
                     correspondingConnection->weight = currentConnection->weight;
                     correspondingConnection->enabled = currentConnection->enabled;
+                    correspondingConnection->innovationNumber = currentConnection->innovationNumber;
                 }
             }
         }

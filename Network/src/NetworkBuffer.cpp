@@ -293,8 +293,6 @@ void nn::NetworkBuffer::saveConnectionScheme(const std::string& filename)
         document << str << ";" << std::endl;
     }
 
-    std::cin.get();
-
     document << "};" << std::endl;
     document << "\\end{document}" << std::endl;
 

@@ -42,8 +42,8 @@ target_link_libraries(NeuralNetworkTest PUBLIC gtest_main)
 target_link_libraries(NeuralNetworkTest PUBLIC NeuralNetwork)
 target_link_libraries(NeuralNetworkTest PUBLIC Profiler)
 
- #add_executable(PopulationDemo ${BenchmarkingSources})
- #target_link_libraries(PopulationDemo PUBLIC NeuralNetwork)
- #target_link_libraries(PopulationDemo PUBLIC Profiler)
+add_executable(PopulationDemo ${BenchmarkingSources})
+target_link_libraries(PopulationDemo PUBLIC NeuralNetwork)
+target_link_libraries(PopulationDemo PUBLIC Profiler)
 
 add_test(Test Test)

@@ -270,3 +270,13 @@ bool operator!=(const connection::Connection& first, const connection::Connectio
 {
     return first.inNeuronLocation != second.inNeuronLocation || first.outNeuronLocation != second.outNeuronLocation;
 }
+
+bool operator==(const connection::ConnectionDummy& first, const connection::ConnectionDummy& second)
+{
+    return first.inNeuronLocation == second.inNeuronLocation && first.outNeuronLocation == second.outNeuronLocation;
+}
+
+bool operator!=(const connection::ConnectionDummy& first, const connection::ConnectionDummy& second)
+{
+    return first.inNeuronLocation != second.inNeuronLocation || first.outNeuronLocation != second.outNeuronLocation;
+}

@@ -2,6 +2,7 @@
 #define POPULATION
 
 #include "NeuralNetwork.h"
+#include "Neuron.h"
 
 namespace population
 {
@@ -23,15 +24,19 @@ namespace population
     class Population
     {
         public:
-        double weightChangingRate = 0;
+        double weightChangingRate = 0.8;
         double neuronAddingRate = 0;
         double connectionAddingRate = 0;
-        double learningRate = 1;
+        double learningRate = 0.2;
+
         double nonMatchingGenesWeight = 1;
         double weightDifferenceWeight = 0.5;
         
+        double targetNumberOfOrganisms; 
         double targetNumberOfSpecies = 1;
         double speciationThreshold;
+
+        std::vector<nn::NeuralNetwork>* networks;
 
         Population(const int& size, nn::NeuralNetwork* templateNetwork);
         ~Population();
@@ -42,12 +47,22 @@ namespace population
 
         double compareNetworks(nn::NeuralNetwork* network1, nn::NeuralNetwork* network2);
         void speciate();
+        void mutate();
+        void crossover();
+
+        nn::NeuralNetwork* getFittest();
 
         private:
-        std::vector<nn::NeuralNetwork>* networks;
+        void assignInnovationNumber(const connection::ConnectionDummy& dummy, bool& found, int& innovationNumber);
+        void addConnection(const connection::ConnectionDummy& dummy, nn::NeuralNetwork& currentNetwork, const bool& found, const int& innovationNumber);
+        void findMatchingConnection(std::vector<connection::Connection*>* connections, const int& innovationNumber, bool& found, double& weight);
+        void computeChildrenAllowed();
+        nn::NeuralNetwork getChild(nn::NeuralNetwork* first, nn::NeuralNetwork* second);
         std::vector<Species> species;
 
         int currentInnovationNumber;
+
+        std::vector<connection::ConnectionDummy> connectionDatabase;
     };
 }
 
