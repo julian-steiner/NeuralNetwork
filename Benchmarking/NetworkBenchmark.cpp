@@ -17,13 +17,13 @@ int main()
     population::Population testPopulation(numberOfNetworks, &templateNetwork);
 
     testPopulation.weightChangingRate = 1;
-    testPopulation.connectionAddingRate = 0.3;
-    testPopulation.neuronAddingRate = 0.15;
+    testPopulation.connectionAddingRate = 0.0015;
+    testPopulation.neuronAddingRate = 0.0005;
     //testPopulation.connectionAddingRate = 0;
     //testPopulation.neuronAddingRate = 0;
     testPopulation.learningRate = 0.5;
 
-    testPopulation.targetNumberOfSpecies = 4;
+    testPopulation.targetNumberOfSpecies = 5;
 
     nn::NeuralNetwork* fittest;
 
@@ -31,7 +31,7 @@ int main()
     int counter = 0;
     double highestFitness = 0;
 
-    int numberOfGenerations = 10000;
+    int numberOfGenerations = 20000;
 
     while (generation <= numberOfGenerations)
     {

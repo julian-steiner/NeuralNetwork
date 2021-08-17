@@ -191,8 +191,8 @@ void Population::speciate()
 
     }
 
-    if (species.size() > targetNumberOfSpecies) speciationThreshold += 0.1;
-    else if (species.size() < targetNumberOfSpecies) speciationThreshold -= 0.1;
+    if (species.size() > targetNumberOfSpecies) speciationThreshold += 0.05;
+    else if (species.size() < targetNumberOfSpecies) speciationThreshold -= 0.05;
 }
 
 void Population::crossover()
@@ -205,7 +205,7 @@ void Population::crossover()
     double totalFitness = getTotalFitness();
     for (Species& currentSpecies: species)
     {
-        for (int i = 0; i < currentSpecies.networks.size(); i++)
+        for (int i = 0; i < currentSpecies.numChildrenAllowed; i++)
         {
             double randomNumber1 = round((std::rand() / (double)RAND_MAX) * (currentSpecies.networks.size()-1));
             double randomNumber2 = round((std::rand() / (double)RAND_MAX) * (currentSpecies.networks.size()-1));
@@ -244,7 +244,7 @@ nn::NeuralNetwork Population::getChild(nn::NeuralNetwork* network1, nn::NeuralNe
             {
                 double pivotNumber;
                 pivotNumber = randomGenerator.getRandomNumber();
-                if (pivotNumber >= 1)
+                if (pivotNumber >= 0.5)
                 {
                     currentConnection->weight = currentMatching->weight;
                 }
@@ -323,7 +323,7 @@ NetworkComparison Population::compareNetworks(nn::NeuralNetwork* first, nn::Neur
     comp.nonMatchingGenes = first->connections->size() - comp.matchingGenes + (second->connections->size() - comp.matchingGenes);
 
     // compute the difference ratio
-    comp.differenceRatio = comp.nonMatchingGenes * nonMatchingGenesWeight + comp.weightDifferences * weightDifferenceWeight;
+    comp.differenceRatio = (comp.nonMatchingGenes * nonMatchingGenesWeight) + (comp.weightDifferences * weightDifferenceWeight);
     return std::move(comp);
 }
 
