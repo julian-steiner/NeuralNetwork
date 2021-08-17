@@ -13,13 +13,16 @@ int main()
     //templateNetwork.connect({0, 0}, {2, 0});
     //templateNetwork.connect({0, 1}, {2, 0});
 
-    int numberOfNetworks = 100;
+    int numberOfNetworks = 50;
     population::Population testPopulation(numberOfNetworks, &templateNetwork);
 
     testPopulation.weightChangingRate = 1;
-    //testPopulation.connectionAddingRate = 0.01;
-    //testPopulation.neuronAddingRate = 0.01;
+    testPopulation.connectionAddingRate = 0;
+    testPopulation.neuronAddingRate = 0.0;
     testPopulation.learningRate = 0.5;
+
+    testPopulation.targetNumberOfSpecies = 4;
+
     nn::NeuralNetwork* fittest;
 
     int generation = 0; 
@@ -62,7 +65,7 @@ int main()
 
         if(counter == 100)
         {
-            std::cout << "Total Fitness: " << totalFitness << "     Generation: " << generation << "    Fittest: " << highestFitness << std::endl;
+            std::cout << "Total Fitness: " << totalFitness << "     Generation: " << generation << "    Fittest: " << highestFitness << "   Species: " << testPopulation.getNumberOfSpecies() <<  std::endl;
             counter = 0;
         }
         counter ++;
@@ -70,6 +73,8 @@ int main()
         generation++;
 
         highestFitness = 0;
+
+        testPopulation.speciate();
 
         if(generation < numberOfGenerations)
         {

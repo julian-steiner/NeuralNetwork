@@ -5,6 +5,7 @@ using namespace population;
 Population::Population(const int& size, nn::NeuralNetwork* templateNetwork)
 {
     currentInnovationNumber = 0;
+    targetNumberOfOrganisms = size;
 
     this->networks = new std::vector<nn::NeuralNetwork>();
     this->networks->reserve(size);
@@ -138,7 +139,6 @@ void Population::mutate()
                 connection::Connection* currentConnection = inNeuron->connections_forward.at(a);
                 if (currentConnection->outNeuronLocation.layer == randomOutLayerNumber && currentConnection->outNeuronLocation.number == randomOutNeuronNumber)
                 {
-                    // Add a node to the connection if it is already connected
                     alreadyConnected = true;
                 }
             }
@@ -195,22 +195,24 @@ void Population::speciate()
     else if (species.size() < targetNumberOfSpecies) speciationThreshold -= 0.1;
 }
 
-
 void Population::crossover()
 {
     std::vector<nn::NeuralNetwork>* nextGeneration = new std::vector<nn::NeuralNetwork>();
-    nextGeneration->reserve(getSize());
+    nextGeneration->reserve(getSize() + 2);
+
+    computeChildrenAllowed();
 
     double totalFitness = getTotalFitness();
-
-    for (int i = 0; i < getSize(); i++)
+    for (Species& currentSpecies: species)
     {
-        double randomNumber1 = round((std::rand() / (double)RAND_MAX) * (this->networks->size()-1));
-        double randomNumber2 = round((std::rand() / (double)RAND_MAX) * (this->networks->size()-1));
+        for (int i = 0; i < currentSpecies.networks.size(); i++)
+        {
+            double randomNumber1 = round((std::rand() / (double)RAND_MAX) * (currentSpecies.networks.size()-1));
+            double randomNumber2 = round((std::rand() / (double)RAND_MAX) * (currentSpecies.networks.size()-1));
 
-        nextGeneration->push_back(getChild(&this->networks->at(randomNumber1), &this->networks->at(randomNumber2)));
+            nextGeneration->push_back(getChild(currentSpecies.networks.at(randomNumber1), currentSpecies.networks.at(randomNumber2)));
+        }
     }
-
     delete networks;
     this->networks = nextGeneration;
 }
@@ -280,18 +282,22 @@ void Population::biasMutate(neuron::Neuron* target)
 
 void Population::addConnection(nn::NeuralNetwork* targetNetwork, connection::NeuronLocation neuron1, connection::NeuronLocation neuron2)
 {
-    targetNetwork->connect(neuron1, neuron2, this->currentInnovationNumber);
-    currentInnovationNumber ++;
+    int innovationNumber;
+    assignInnovationNumber({neuron1, neuron2, 0}, innovationNumber);
+    targetNetwork->connect(neuron1, neuron2, innovationNumber);
 }
 
 void Population::addNeuron(nn::NeuralNetwork* targetNetwork, connection::Connection* target)
 {
+    int innovationNumber;
     target->enabled = false;
+    assignInnovationNumber({target->inNeuronLocation, {1, (int)targetNetwork->layers->at(1)->getSize()-1}, 0}, innovationNumber);
+
     targetNetwork->addNeuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, 1);
-    targetNetwork->connect(target->inNeuronLocation, {1, (int)targetNetwork->layers->at(1)->getSize()-1}, currentInnovationNumber);
-    currentInnovationNumber ++;
-    targetNetwork->connect({1, (int)targetNetwork->layers->at(1)->getSize()-1}, target->outNeuronLocation, currentInnovationNumber);
-    currentInnovationNumber ++;
+    targetNetwork->connect(target->inNeuronLocation, {1, (int)targetNetwork->layers->at(1)->getSize()-1}, innovationNumber);
+
+    assignInnovationNumber({{1, (int)targetNetwork->layers->at(1)->getSize()-1}, target->outNeuronLocation, 0}, innovationNumber);
+    targetNetwork->connect({1, (int)targetNetwork->layers->at(1)->getSize()-1}, target->outNeuronLocation, innovationNumber);
 }
 
 NetworkComparison Population::compareNetworks(nn::NeuralNetwork* first, nn::NeuralNetwork* second)
@@ -335,4 +341,47 @@ double Population::getMaxDifference(nn::NeuralNetwork* reference)
     }
 
     return maxDifferenceRatio;
+}
+
+void Population::computeChildrenAllowed()
+{
+    // Computing the total fitness
+    double totalFitness = 0;
+    double totalChildrenAllowed = 0;
+    double highestChildrenAllowed = 0;
+    Species* biggestSpecies = 0;
+
+    for (Species& currentSpecies : species)
+    {
+        // Taking the sum of all networks in a generation
+        currentSpecies.totalFitness = 0;
+        for (nn::NeuralNetwork* currentNetwork : currentSpecies.networks)
+        {
+            currentNetwork->fitness /= pow(currentSpecies.networks.size(), 2);
+            currentSpecies.totalFitness += currentNetwork->fitness;
+        }
+
+        // Normalizing the fitness
+        totalFitness += currentSpecies.totalFitness;
+    }
+
+    for (Species& currentSpecies : species)
+    {
+        currentSpecies.numChildrenAllowed = round((currentSpecies.totalFitness / totalFitness) * networks->size());
+
+        // Get the network with the most children allowed
+        totalChildrenAllowed += currentSpecies.numChildrenAllowed;
+        if (currentSpecies.numChildrenAllowed > highestChildrenAllowed) 
+        {
+            highestChildrenAllowed = currentSpecies.numChildrenAllowed;
+            biggestSpecies = &currentSpecies;
+        }
+    }
+
+    biggestSpecies->numChildrenAllowed += targetNumberOfOrganisms - totalChildrenAllowed;
+}
+
+int Population::getNumberOfSpecies()
+{
+    return species.size();
 }

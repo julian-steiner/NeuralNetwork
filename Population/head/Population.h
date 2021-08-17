@@ -11,7 +11,6 @@ namespace population
     private:
         unsigned int seed = std::chrono::system_clock::now().time_since_epoch().count();
         std::default_random_engine engine = std::default_random_engine(seed);
-        //std::normal_distribution<double> distr = std::normal_distribution<double>(0.0, 1.0);
         std::uniform_real_distribution<double> distr = std::uniform_real_distribution<double>(0.0, 1.0);
 
     public:
@@ -48,6 +47,7 @@ namespace population
         double weightDifferenceWeight = 0.5;
 
         double targetNumberOfSpecies = 1;
+        double targetNumberOfOrganisms = 0;
         double speciationThreshold = 0;
 
         std::vector<connection::ConnectionDummy> connectionDatabase;
@@ -63,6 +63,8 @@ namespace population
         void speciate();
         void crossover();
 
+        int getNumberOfSpecies();
+
         private:
         RandomGenerator randomGenerator;
 
@@ -74,6 +76,7 @@ namespace population
         void biasMutate(neuron::Neuron* target);
         void addConnection(nn::NeuralNetwork* targetNetwork, connection::NeuronLocation neuron1, connection::NeuronLocation neuron2);
         void addNeuron(nn::NeuralNetwork* targetNetwork, connection::Connection* target);
+        void computeChildrenAllowed();
         std::vector<nn::NeuralNetwork>* networks;
         std::vector<Species> species;
         int currentInnovationNumber;
