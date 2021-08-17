@@ -8,6 +8,15 @@ Population::Population(const int& size, nn::NeuralNetwork* templateNetwork)
 
     this->networks = new std::vector<nn::NeuralNetwork>();
     this->networks->reserve(size);
+
+    // Setting the start of the innovation number to the end of the template network 
+    for (connection::Connection* currentConnection: *templateNetwork->connections)
+    {
+        int innovationNumber;
+        assignInnovationNumber({currentConnection->inNeuronLocation, currentConnection->outNeuronLocation, 0}, innovationNumber);
+        currentConnection->innovationNumber = innovationNumber;
+    }
+
     for (int i = 0; i < size; i++)
     {
         this->networks->push_back(templateNetwork->getCopy<nn::NeuralNetwork>());
@@ -38,6 +47,26 @@ int Population::getCurrentInnovationNumber()
     return currentInnovationNumber;
 }
 
+void Population::assignInnovationNumber(const connection::ConnectionDummy& dummy, int& innovationNumber)
+{
+    bool found = false;
+    for(int j = 0; j > connectionDatabase.size(); j++)
+    {
+        const connection::ConnectionDummy& currentDummy = connectionDatabase.at(j);
+        if (currentDummy == dummy)
+        {
+            found = true;
+            innovationNumber = j;
+            break;
+        }
+    }
+    if (found == false)
+    {
+        connectionDatabase.push_back(dummy);
+        innovationNumber = connectionDatabase.size() - 1;
+    }
+}
+
 void Population::mutate()
 {
     double randomNumber;
@@ -47,10 +76,10 @@ void Population::mutate()
         nn::NeuralNetwork* currentNeuralNetwork = getNetwork(i);
 
         // handle changing of a weight
-        randomNumber = std::rand() /  (double)RAND_MAX;
+        randomNumber = randomGenerator.getRandomNumber();
         if (randomNumber < weightChangingRate)
         {
-            randomNumber = round(std::rand() / (double)RAND_MAX * currentNeuralNetwork->connections->size()-1);
+            randomNumber = round(randomGenerator.getRandomNumber() * currentNeuralNetwork->connections->size()-1);
             if (randomNumber >= 0)
             {
                 weightMutate(currentNeuralNetwork->connections->at(randomNumber));
@@ -58,10 +87,10 @@ void Population::mutate()
         }
 
         // handle changing of a bias
-        randomNumber = std::rand() /  (double)RAND_MAX;
+        randomNumber = randomGenerator.getRandomNumber();
         if (randomNumber < weightChangingRate)
         {
-            randomNumber = round(std::rand() / (double)RAND_MAX * currentNeuralNetwork->neurons->size()-1);
+            randomNumber = round(randomGenerator.getRandomNumber() * currentNeuralNetwork->neurons->size()-1);
             if (randomNumber >= 0)
             {
                 biasMutate(currentNeuralNetwork->neurons->at(randomNumber));
@@ -69,10 +98,10 @@ void Population::mutate()
         }
 
         // handle neuron insertions
-        randomNumber = std::rand() /  (double)RAND_MAX;
+        randomNumber = randomGenerator.getRandomNumber();
         if (randomNumber < neuronAddingRate)
         {
-            randomNumber = round(std::rand() / (double)RAND_MAX * currentNeuralNetwork->connections->size()-1);
+            randomNumber = round(randomGenerator.getRandomNumber() * currentNeuralNetwork->connections->size()-1);
             if (randomNumber >= 0)
             {
                 addNeuron(currentNeuralNetwork, currentNeuralNetwork->connections->at(randomNumber));
@@ -80,25 +109,25 @@ void Population::mutate()
         }
 
         // handle connecting 2 neurons 
-        randomNumber = std::rand() /  (double)RAND_MAX;
+        randomNumber = randomGenerator.getRandomNumber();
         if (randomNumber < connectionAddingRate)
         {
             // the -1 making sure that only layers 0 and 1 can be the origin of the connection
-            int randomInLayerNumber = round(std::rand() / (double)RAND_MAX * (currentNeuralNetwork->layers->size()-2));
+            int randomInLayerNumber = round(randomGenerator.getRandomNumber() * (currentNeuralNetwork->layers->size()-2));
             if(currentNeuralNetwork->layers->at(randomInLayerNumber)->neurons.size() == 0)
             {
                 randomInLayerNumber --;
             }
-            int randomInNeuronNumber = round(std::rand() / (double)RAND_MAX * (currentNeuralNetwork->layers->at(randomInLayerNumber)->neurons.size()-1));
+            int randomInNeuronNumber = round(randomGenerator.getRandomNumber() * (currentNeuralNetwork->layers->at(randomInLayerNumber)->neurons.size()-1));
             neuron::Neuron* inNeuron = currentNeuralNetwork->layers->at(randomInLayerNumber)->neurons.at(randomInNeuronNumber);
 
             // the +1 making sure that only layers 1 and 2 can be the output of the connection
-            int randomOutLayerNumber = round(std::rand() / (double)RAND_MAX * (currentNeuralNetwork->layers->size()-2) + 1);
+            int randomOutLayerNumber = round(randomGenerator.getRandomNumber() * (currentNeuralNetwork->layers->size()-2) + 1);
             if(currentNeuralNetwork->layers->at(randomOutLayerNumber)->neurons.size() == 0)
             {
                 randomOutLayerNumber ++;
             }
-            int randomOutNeuronNumber = round(std::rand() / (double)RAND_MAX * (currentNeuralNetwork->layers->at(randomOutLayerNumber)->neurons.size()-1));
+            int randomOutNeuronNumber = round(randomGenerator.getRandomNumber() * (currentNeuralNetwork->layers->at(randomOutLayerNumber)->neurons.size()-1));
             neuron::Neuron* outNeuron = currentNeuralNetwork->layers->at(randomOutLayerNumber)->neurons.at(randomOutNeuronNumber);
 
 
@@ -122,6 +151,50 @@ void Population::mutate()
         }
     }
 }
+
+void Population::speciate()
+{
+    species.clear();
+    // Copying all the pointers of the networks
+    std::vector<nn::NeuralNetwork*> networksCopy;
+    networksCopy.reserve(networks->size());
+    for(int i = 0; i < networks->size(); i++)
+    {
+        networksCopy.push_back(&networks->at(i));
+    }
+
+    // Speciating till all networks have their species
+    while(networksCopy.size() > 0)
+    {
+        // Selecting 1 at random and comparing all to it
+        int randomNumber = randomGenerator.getRandomNumber() * (networksCopy.size() - 1);
+        std::vector<nn::NeuralNetwork*>::iterator randomNetworkIt = networksCopy.begin() + randomNumber;
+
+        species.emplace_back(Species());
+        species.back().networks.push_back(*randomNetworkIt);
+
+        std::vector<nn::NeuralNetwork*>::iterator it = networksCopy.begin();
+
+        while(*it != networksCopy.back())
+        {
+            if (compareNetworks(*randomNetworkIt, *it).differenceRatio <= speciationThreshold)
+            {
+                species.back().networks.push_back(*it);
+                networksCopy.erase(it);
+                it--;
+            }
+            it ++;
+        }
+
+        if(*randomNetworkIt == networksCopy.back()) networksCopy.pop_back();
+        else    networksCopy.erase(randomNetworkIt);
+
+    }
+
+    if (species.size() > targetNumberOfSpecies) speciationThreshold += 0.1;
+    else if (species.size() < targetNumberOfSpecies) speciationThreshold -= 0.1;
+}
+
 
 void Population::crossover()
 {
@@ -165,10 +238,11 @@ nn::NeuralNetwork Population::getChild(nn::NeuralNetwork* network1, nn::NeuralNe
     {
         for (connection::Connection* currentMatching : *lower->connections)
         {
-            if (currentMatching->innovationNumber = currentConnection->innovationNumber)
+            if (currentMatching->innovationNumber == currentConnection->innovationNumber)
             {
-                double randomNumber = std::rand() / (double)RAND_MAX;
-                if (randomNumber >= 0.5)
+                double pivotNumber;
+                pivotNumber = randomGenerator.getRandomNumber();
+                if (pivotNumber >= 1)
                 {
                     currentConnection->weight = currentMatching->weight;
                 }
@@ -245,56 +319,6 @@ NetworkComparison Population::compareNetworks(nn::NeuralNetwork* first, nn::Neur
     // compute the difference ratio
     comp.differenceRatio = comp.nonMatchingGenes * nonMatchingGenesWeight + comp.weightDifferences * weightDifferenceWeight;
     return std::move(comp);
-}
-
-void Population::speciate()
-{
-    this->species.clear();
-    this->species.reserve(numberOfSpecies);
-
-    // copying all the networkPointers into a vector for easier speciation
-    std::vector<nn::NeuralNetwork*> networkPointers = std::vector<nn::NeuralNetwork*>();
-    networkPointers.reserve(this->networks->size());
-
-    for(int i = 0; i < this->networks->size(); i++)
-    {
-        networkPointers.push_back(getNetwork(i));
-    }
-
-    // adding the networks to the different species
-    for (int i = 0; i < numberOfSpecies; i++)
-    {
-        this->species.emplace_back(std::vector<nn::NeuralNetwork*>());
-
-        // end if there are no networks in the population
-        if(networkPointers.size() == 0)
-        {
-            continue;
-        }
-
-        int randomNumber = round((std::rand() / (double)RAND_MAX) * (networkPointers.size()-1));
-        nn::NeuralNetwork* populationPivot = networkPointers.at(randomNumber);
-        networkPointers.erase(networkPointers.begin() + randomNumber);
-
-        double maxDifference = getMaxDifference(populationPivot);
-        double speciationThreshold = maxDifference / (numberOfSpecies - i);
-
-        this->species.at(i).push_back(populationPivot);
-
-        // go through every network and add them to the species if they are similar to the pivot element
-        std::vector<nn::NeuralNetwork*>::iterator pointerIt = networkPointers.begin();
-
-        while(pointerIt != networkPointers.end())
-        {
-            if (compareNetworks(populationPivot, *pointerIt).differenceRatio <= speciationThreshold)
-            {
-                this->species.at(i).push_back(*pointerIt);
-                networkPointers.erase(pointerIt);
-                pointerIt--;
-            }
-            pointerIt++;
-        }
-    }
 }
 
 double Population::getMaxDifference(nn::NeuralNetwork* reference)

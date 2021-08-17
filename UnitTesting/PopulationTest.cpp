@@ -131,7 +131,7 @@ TEST(Population, SpeciatingCorrectly)
     population::Population testPopulation(10, &testNetwork);
     testPopulation.weightChangingRate = 0.8;
     testPopulation.connectionAddingRate = 1;
-    testPopulation.numberOfSpecies = 4;
+    testPopulation.targetNumberOfSpecies = 4;
 
     testPopulation.mutate();
 
