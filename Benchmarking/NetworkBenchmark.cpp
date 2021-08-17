@@ -7,8 +7,8 @@ int main()
 {
     nn::NeuralNetwork templateNetwork;
     templateNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
-    //templateNetwork.addLayer(0, neuron::Activation::Sigmoid, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
-    templateNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Hidden, nn::LayerConnectionType::FullyConnected);
+    templateNetwork.addLayer(0, neuron::Activation::Sigmoid, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
+    //templateNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Hidden, nn::LayerConnectionType::FullyConnected);
     templateNetwork.addLayer(1, neuron::Activation::Sigmoid, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
     //templateNetwork.connect({0, 0}, {2, 0});
     //templateNetwork.connect({0, 1}, {2, 0});
@@ -17,8 +17,10 @@ int main()
     population::Population testPopulation(numberOfNetworks, &templateNetwork);
 
     testPopulation.weightChangingRate = 1;
-    testPopulation.connectionAddingRate = 0;
-    testPopulation.neuronAddingRate = 0.0;
+    testPopulation.connectionAddingRate = 0.3;
+    testPopulation.neuronAddingRate = 0.15;
+    //testPopulation.connectionAddingRate = 0;
+    //testPopulation.neuronAddingRate = 0;
     testPopulation.learningRate = 0.5;
 
     testPopulation.targetNumberOfSpecies = 4;
@@ -29,7 +31,7 @@ int main()
     int counter = 0;
     double highestFitness = 0;
 
-    int numberOfGenerations = 5000;
+    int numberOfGenerations = 10000;
 
     while (generation <= numberOfGenerations)
     {
@@ -113,4 +115,7 @@ int main()
 
     std::cout << "Error: " << error << std::endl;
     std::cout << fittest->fitness << std::endl;
+
+    fittest->saveConnectionScheme("Schemes/NeuralNetwork.tex");
+
 }

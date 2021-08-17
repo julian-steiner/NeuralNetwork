@@ -7,6 +7,8 @@
 #include <sstream>
 #include "Layer.h"
 #include "CopyNetworkImpl.h"
+#include <fstream>
+#include <algorithm>
 
 namespace nn
 {
@@ -51,6 +53,8 @@ namespace nn
 
         template<typename T>
         T getCopy();
+
+        void saveConnectionScheme(const std::string& filename);
     };
 }
 
