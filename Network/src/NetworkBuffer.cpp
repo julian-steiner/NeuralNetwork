@@ -272,8 +272,9 @@ std::vector<std::string> nn::NetworkBuffer::getConnectionScheme()
 
 void nn::NetworkBuffer::saveConnectionScheme(const std::string& filename)
 {
-    std::fstream document;
+    std::ofstream document;
     document.open(filename);
+    document.clear();
 
     if (!document)
     {
