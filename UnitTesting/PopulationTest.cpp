@@ -91,32 +91,6 @@ TEST(Population, CrossingOverworkingCorrectly)
     }
 }
 
-TEST(Population, NetworkComparisonWorking)
-{
-    nn::NeuralNetwork testNetwork;
-    testNetwork.addLayer(1, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
-    testNetwork.addLayer(0, neuron::Activation::Sigmoid, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
-    testNetwork.addLayer(1, neuron::Activation::Sigmoid, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
-    testNetwork.addNeuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, 1);
-    testNetwork.addNeuron(neuron::NeuronType::Hidden, neuron::Activation::Sigmoid, 1);
-    testNetwork.connect({0, 0}, {1, 0}, 0);
-    testNetwork.connect({1, 0}, {2, 0}, 1);
-
-    population::Population testPopulation(2, &testNetwork);
-
-    population::NetworkComparison testComparison = testPopulation.compareNetworks(testPopulation.getNetwork(0), testPopulation.getNetwork(1));
-
-    ASSERT_EQ(testComparison.matchingGenes, 2);
-    ASSERT_EQ(testComparison.nonMatchingGenes, 0);
-
-    testPopulation.getNetwork(0)->connect({0, 0}, {1, 1}, 2);
-
-    testComparison = testPopulation.compareNetworks(testPopulation.getNetwork(0), testPopulation.getNetwork(1));
-
-    ASSERT_EQ(testComparison.matchingGenes, 2);
-    ASSERT_EQ(testComparison.nonMatchingGenes, 1);
-}
-
 TEST(Population, SpeciatingCorrectly)
 {
     nn::NeuralNetwork testNetwork;

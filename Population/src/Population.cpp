@@ -4,13 +4,13 @@ using namespace population;
 
 Population::Population(const int& size, nn::NeuralNetwork* templateNetwork)
 {
-    currentInnovationNumber = 0;
     targetNumberOfOrganisms = size;
 
+    // Creating the networks vector
     this->networks = new std::vector<nn::NeuralNetwork>();
     this->networks->reserve(size);
 
-    // Setting the start of the innovation number to the end of the template network 
+    // Assigning innovation numbers to the network template
     for (connection::Connection* currentConnection: *templateNetwork->connections)
     {
         int innovationNumber;
@@ -18,18 +18,10 @@ Population::Population(const int& size, nn::NeuralNetwork* templateNetwork)
         currentConnection->innovationNumber = innovationNumber;
     }
 
+    // Filling the networks
     for (int i = 0; i < size; i++)
     {
         this->networks->push_back(templateNetwork->getCopy<nn::NeuralNetwork>());
-    }
-
-    // Setting the start of the innovation number to the end of the template network 
-    for (connection::Connection* currentConnection: *this->networks->back().connections)
-    {
-        if (currentConnection->innovationNumber > currentInnovationNumber) 
-        {
-            currentInnovationNumber = currentConnection->innovationNumber;
-        }
     }
 }
 
@@ -43,112 +35,137 @@ nn::NeuralNetwork* Population::getNetwork(int number)
     return &this->networks->at(number);
 }
 
-int Population::getCurrentInnovationNumber()
-{
-    return currentInnovationNumber;
-}
-
 void Population::assignInnovationNumber(const connection::ConnectionDummy& dummy, int& innovationNumber)
 {
-    bool found = false;
-    for(int j = 0; j > connectionDatabase.size(); j++)
+    // Find the connectionDummy in the vector
+    std::vector<connection::ConnectionDummy>::iterator it = std::find_if(connectionDatabase.begin(), connectionDatabase.end(), [dummy](const connection::ConnectionDummy& currentDummy){return currentDummy == dummy;});
+
+    if (it == connectionDatabase.end())
     {
-        const connection::ConnectionDummy& currentDummy = connectionDatabase.at(j);
-        if (currentDummy == dummy)
-        {
-            found = true;
-            innovationNumber = j;
-            break;
-        }
-    }
-    if (found == false)
-    {
+        // Add it to the database if it isn't found
         connectionDatabase.push_back(dummy);
         innovationNumber = connectionDatabase.size() - 1;
     }
+    else
+    {
+        // Returning the innovationNumber else
+        innovationNumber = std::distance(connectionDatabase.begin(), it);
+    }
+}
+
+connection::NeuronLocation Population::generateRandomNeuronLocation(nn::NeuralNetwork* currentNeuralNetwork)
+{
+    int randomLayerNumber = round(randomGenerator.getRandomNumber() * (currentNeuralNetwork->layers->size()-1));
+    int randomNeuronNumber = round(randomGenerator.getRandomNumber() * (currentNeuralNetwork->layers->at(randomLayerNumber)->neurons.size()-1));
+    return {randomLayerNumber, randomNeuronNumber};
+}
+
+bool Population::validateConnection(nn::NeuralNetwork* currentNeuralNetwork, const connection::ConnectionDummy& connectionDummy)
+{
+    // Checking if the location is valid
+    if (connectionDummy.inNeuronLocation.number < 0 || connectionDummy.outNeuronLocation.number < 0) return false;
+    // Preventing connections in the same layer and backward connections
+    if (connectionDummy.inNeuronLocation.layer == connectionDummy.outNeuronLocation.layer && connectionDummy.inNeuronLocation.layer != 1) return false;
+    if (connectionDummy.inNeuronLocation.layer > connectionDummy.outNeuronLocation.layer) return false;
+    // Checking if it's the same neuron
+    if (connectionDummy.inNeuronLocation.layer == connectionDummy.outNeuronLocation.layer) return false;
+    if (connectionDummy.inNeuronLocation.number == connectionDummy.outNeuronLocation.number) return false;
+    // Checking if the connection would cause recursion
+    if (currentNeuralNetwork->checkForRecursion({connectionDummy.inNeuronLocation.layer,
+                                                 connectionDummy.inNeuronLocation.number},
+                                                 {connectionDummy.outNeuronLocation.layer,
+                                                 connectionDummy.outNeuronLocation.number})) return false;
+
+    // check if the connection already exists
+    neuron::Neuron* inNeuron = currentNeuralNetwork->layers->at(connectionDummy.inNeuronLocation.layer)->neurons.at(connectionDummy.inNeuronLocation.number);
+    std::vector<connection::Connection*>::iterator it = std::find_if(inNeuron->connections_forward.begin(),
+                                                                     inNeuron->connections_forward.end(),
+                                                                     [connectionDummy](connection::Connection* currentConnection){return currentConnection->outNeuronLocation.layer == connectionDummy.outNeuronLocation.layer &&
+                                                                                                                                         currentConnection->outNeuronLocation.number == connectionDummy.outNeuronLocation.number;});
+    if (it != inNeuron->connections_forward.end()) return false;
+
+    return true;
+}
+
+void Population::handleWeightMutations(nn::NeuralNetwork* currentNeuralNetwork)
+{
+    if (randomGenerator.getRandomNumber() < weightChangingRate)
+    {
+        double randomNumber = round(randomGenerator.getRandomNumber() * currentNeuralNetwork->connections->size()-1);
+        if (randomNumber >= 0)
+        {
+            weightMutate(currentNeuralNetwork->connections->at(randomNumber));
+        }
+    }
+}
+
+void Population::handleBiasMutations(nn::NeuralNetwork* currentNeuralNetwork)
+{
+    if (randomGenerator.getRandomNumber() < weightChangingRate)
+    {
+        double randomNumber = round(randomGenerator.getRandomNumber() * currentNeuralNetwork->neurons->size()-1);
+        if (randomNumber >= 0)
+        {
+            biasMutate(currentNeuralNetwork->neurons->at(randomNumber));
+        }
+    }
+}
+
+void Population::handleConnectionMutations(nn::NeuralNetwork* currentNeuralNetwork)
+{
+    if (randomGenerator.getRandomNumber() < connectionAddingRate)
+    {
+        // Giving 20 chances to find a valid connection
+        for (int i = 0; i < 20; i++)
+        {
+            // Generating random locations
+            connection::NeuronLocation inputNeuron = generateRandomNeuronLocation(currentNeuralNetwork);
+            connection::NeuronLocation outputNeuron = generateRandomNeuronLocation(currentNeuralNetwork);
+            
+            // Validating the connection
+            connection::ConnectionDummy dummy = {inputNeuron, outputNeuron, 0};
+            bool connectionIsValid = validateConnection(currentNeuralNetwork, dummy);
+
+            // Add the connection
+            if (connectionIsValid) addConnection(currentNeuralNetwork, {inputNeuron.layer, inputNeuron.number}, {outputNeuron.layer, outputNeuron.number});
+        }
+    }
+
+}
+
+void Population::handleNeuronMutations(nn::NeuralNetwork* currentNeuralNetwork)
+{
+    if (randomGenerator.getRandomNumber() < neuronAddingRate)
+    {
+        double randomNumber = round(randomGenerator.getRandomNumber() * currentNeuralNetwork->connections->size()-1);
+        if (randomNumber >= 0)
+        {
+            addNeuron(currentNeuralNetwork, currentNeuralNetwork->connections->at(randomNumber));
+        }
+    }
+}
+
+void Population::handleNumberMutations(nn::NeuralNetwork* currentNeuralNetwork)
+{
+    handleWeightMutations(currentNeuralNetwork);
+    handleBiasMutations(currentNeuralNetwork);
+}
+
+void Population::handleStructuralMutations(nn::NeuralNetwork* currentNeuralNetwork)
+{
+    handleNeuronMutations(currentNeuralNetwork);
+    handleConnectionMutations(currentNeuralNetwork);
 }
 
 void Population::mutate()
 {
-    double randomNumber;
-
     for(int i = 0; i < this->networks->size(); i++)
     {
         nn::NeuralNetwork* currentNeuralNetwork = getNetwork(i);
 
-        // handle changing of a weight
-        randomNumber = randomGenerator.getRandomNumber();
-        if (randomNumber < weightChangingRate)
-        {
-            randomNumber = round(randomGenerator.getRandomNumber() * currentNeuralNetwork->connections->size()-1);
-            if (randomNumber >= 0)
-            {
-                weightMutate(currentNeuralNetwork->connections->at(randomNumber));
-            }
-        }
+        handleNumberMutations(currentNeuralNetwork);
 
-        // handle changing of a bias
-        randomNumber = randomGenerator.getRandomNumber();
-        if (randomNumber < weightChangingRate)
-        {
-            randomNumber = round(randomGenerator.getRandomNumber() * currentNeuralNetwork->neurons->size()-1);
-            if (randomNumber >= 0)
-            {
-                biasMutate(currentNeuralNetwork->neurons->at(randomNumber));
-            }
-        }
-
-        // handle neuron insertions
-        randomNumber = randomGenerator.getRandomNumber();
-        if (randomNumber < neuronAddingRate)
-        {
-            randomNumber = round(randomGenerator.getRandomNumber() * currentNeuralNetwork->connections->size()-1);
-            if (randomNumber >= 0)
-            {
-                addNeuron(currentNeuralNetwork, currentNeuralNetwork->connections->at(randomNumber));
-            }
-        }
-
-        // handle connecting 2 neurons 
-        randomNumber = randomGenerator.getRandomNumber();
-        if (randomNumber < connectionAddingRate)
-        {
-            // the -1 making sure that only layers 0 and 1 can be the origin of the connection
-            int randomInLayerNumber = round(randomGenerator.getRandomNumber() * (currentNeuralNetwork->layers->size()-2));
-            if(currentNeuralNetwork->layers->at(randomInLayerNumber)->neurons.size() == 0)
-            {
-                randomInLayerNumber --;
-            }
-            int randomInNeuronNumber = round(randomGenerator.getRandomNumber() * (currentNeuralNetwork->layers->at(randomInLayerNumber)->neurons.size()-1));
-            neuron::Neuron* inNeuron = currentNeuralNetwork->layers->at(randomInLayerNumber)->neurons.at(randomInNeuronNumber);
-
-            // the +1 making sure that only layers 1 and 2 can be the output of the connection
-            int randomOutLayerNumber = round(randomGenerator.getRandomNumber() * (currentNeuralNetwork->layers->size()-2) + 1);
-            if(currentNeuralNetwork->layers->at(randomOutLayerNumber)->neurons.size() == 0)
-            {
-                randomOutLayerNumber ++;
-            }
-            int randomOutNeuronNumber = round(randomGenerator.getRandomNumber() * (currentNeuralNetwork->layers->at(randomOutLayerNumber)->neurons.size()-1));
-            neuron::Neuron* outNeuron = currentNeuralNetwork->layers->at(randomOutLayerNumber)->neurons.at(randomOutNeuronNumber);
-
-
-            // check if the neuron is connected already
-            bool alreadyConnected = false;
-            for (int a = 0; a < inNeuron->connections_forward.size(); a++)
-            {
-                connection::Connection* currentConnection = inNeuron->connections_forward.at(a);
-                if (currentConnection->outNeuronLocation.layer == randomOutLayerNumber && currentConnection->outNeuronLocation.number == randomOutNeuronNumber)
-                {
-                    alreadyConnected = true;
-                }
-            }
-
-            // add a connection if it isn't already connected or it would cause recursion
-            if (alreadyConnected == false && ((randomInLayerNumber != randomOutLayerNumber) || (randomInNeuronNumber != randomOutNeuronNumber)) && !currentNeuralNetwork->checkForRecursion({randomInLayerNumber, randomInNeuronNumber}, {randomOutLayerNumber, randomOutNeuronNumber}))
-            {
-                addConnection(currentNeuralNetwork, {randomInLayerNumber, randomInNeuronNumber}, {randomOutLayerNumber, randomOutNeuronNumber});
-            }
-        }
+        handleStructuralMutations(currentNeuralNetwork);
     }
 }
 
@@ -198,9 +215,12 @@ void Population::speciate()
 void Population::crossover()
 {
     std::vector<nn::NeuralNetwork>* nextGeneration = new std::vector<nn::NeuralNetwork>();
-    nextGeneration->reserve(getSize() + 2);
+
+    nextGeneration->reserve(networks->size()+5);
 
     computeChildrenAllowed();
+    double children = 0;
+    double maxAllowed = 0;
 
     double totalFitness = getTotalFitness();
     for (Species& currentSpecies: species)
@@ -213,6 +233,7 @@ void Population::crossover()
             nextGeneration->push_back(getChild(currentSpecies.networks.at(randomNumber1), currentSpecies.networks.at(randomNumber2)));
         }
     }
+
     delete networks;
     this->networks = nextGeneration;
 }

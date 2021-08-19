@@ -38,48 +38,69 @@ namespace population
     class Population
     {
         public:
+        // Changing dials for mutation
         double weightChangingRate = 0;
         double neuronAddingRate = 0;
         double connectionAddingRate = 0;
         double learningRate = 1;
+
+        // Weights for network speciation
         double nonMatchingGenesWeight = 1;
         double weightDifferenceWeight = 0.5;
-
         double targetNumberOfSpecies = 1;
         double targetNumberOfOrganisms = 0;
         double speciationThreshold = 0;
 
-        std::vector<connection::ConnectionDummy> connectionDatabase;
-
+        // Constructor
         Population(const int& size, nn::NeuralNetwork* templateNetwork);
         ~Population();
 
+        // Getters
+        int getSize();
+        int getNumberOfSpecies();
         nn::NeuralNetwork* getNetwork(int number);
-        int getCurrentInnovationNumber();
 
+        // Core Methods
         void mutate();
-        population::NetworkComparison compareNetworks(nn::NeuralNetwork* first, nn::NeuralNetwork* second);
         void speciate();
         void crossover();
 
-        int getNumberOfSpecies();
-
         private:
         RandomGenerator randomGenerator;
+        std::vector<connection::ConnectionDummy> connectionDatabase;
+        std::vector<nn::NeuralNetwork>* networks;
+        std::vector<Species> species;
 
-        nn::NeuralNetwork getChild(nn::NeuralNetwork* first, nn::NeuralNetwork* second);
-        int getSize();
-        double getTotalFitness();
-        double getMaxDifference(nn::NeuralNetwork* reference);
+
+        // Methods for mutation
+        connection::NeuronLocation generateRandomNeuronLocation(nn::NeuralNetwork* currentNeuralNetwork);
+        bool validateConnection(nn::NeuralNetwork* currentNeuralNetwork, const connection::ConnectionDummy& connectionDummy);
+
+        void handleNumberMutations(nn::NeuralNetwork* currentNeuralNetwork);
+        void handleWeightMutations(nn::NeuralNetwork* currentNeuralNetwork);
+        void handleBiasMutations(nn::NeuralNetwork* currentNeuralNetwork);
+
+        void handleConnectionMutations(nn::NeuralNetwork* currentNeuralNetwork);
+        void handleNeuronMutations(nn::NeuralNetwork* currentNeuralNetwork);
+        void handleStructuralMutations(nn::NeuralNetwork* currentNeuralNetwork);
+
         void weightMutate(connection::Connection* target);
         void biasMutate(neuron::Neuron* target);
         void addConnection(nn::NeuralNetwork* targetNetwork, connection::NeuronLocation neuron1, connection::NeuronLocation neuron2);
         void addNeuron(nn::NeuralNetwork* targetNetwork, connection::Connection* target);
-        void computeChildrenAllowed();
-        std::vector<nn::NeuralNetwork>* networks;
-        std::vector<Species> species;
-        int currentInnovationNumber;
 
+        // Methods relevant for speciation
+        population::NetworkComparison compareNetworks(nn::NeuralNetwork* first, nn::NeuralNetwork* second);
+
+        // Methods for computing children
+        double getTotalFitness();
+        double getMaxDifference(nn::NeuralNetwork* reference);
+        void computeChildrenAllowed();
+
+        // Methods for crossover
+        nn::NeuralNetwork getChild(nn::NeuralNetwork* first, nn::NeuralNetwork* second);
+
+        // Innovation Number management
         void assignInnovationNumber(const connection::ConnectionDummy& dummy, int& innovationNumber);
     };
 }

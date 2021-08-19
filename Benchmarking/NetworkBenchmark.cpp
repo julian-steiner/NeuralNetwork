@@ -17,7 +17,7 @@ int main()
     population::Population testPopulation(numberOfNetworks, &templateNetwork);
 
     testPopulation.weightChangingRate = 1;
-    testPopulation.connectionAddingRate = 0.0015;
+    testPopulation.connectionAddingRate = 0.15;
     testPopulation.neuronAddingRate = 0.0005;
     //testPopulation.connectionAddingRate = 0;
     //testPopulation.neuronAddingRate = 0;
