@@ -36,6 +36,7 @@ set(BenchmarkingSources
 add_library(Profiler ${ProfilerSources})
 
 add_library(NeuralNetwork ${NetworkSources})
+target_precompile_headers(NeuralNetwork PUBLIC pch/NetworkHeader.pch)
 
 add_executable(NeuralNetworkTest ${TestingSources})
 target_link_libraries(NeuralNetworkTest PUBLIC gtest_main)

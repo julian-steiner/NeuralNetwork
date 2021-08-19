@@ -1,0 +1,15 @@
+#ifndef NETWORKHEADER
+#define NETWORKHEADER
+
+#include <vector>
+#include <memory>
+#include <string>
+#include <sstream>
+#include <fstream>
+#include <algorithm>
+#include <future>
+#include <iostream>
+#include <cmath>
+#include <random>
+
+#endif

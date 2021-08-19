@@ -1,14 +1,8 @@
 #ifndef NEURALNETWORK
 #define NEURALNETWORK
 
-#include <vector>
-#include <memory>
-#include <string>
-#include <sstream>
 #include "Layer.h"
 #include "CopyNetworkImpl.h"
-#include <fstream>
-#include <algorithm>
 
 namespace nn
 {

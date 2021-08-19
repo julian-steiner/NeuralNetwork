@@ -2,7 +2,6 @@
 #define POPULATION
 
 #include "NeuralNetwork.h"
-#include <random>
 
 namespace population
 {

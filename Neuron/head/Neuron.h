@@ -1,12 +1,6 @@
 #ifndef NeuronHeader
 #define NeuronHeader
 
-#include <vector>
-#include <memory>
-#include <iostream>
-#include <cmath>
-#include <random>
-
 namespace connection
 {
     struct Connection;

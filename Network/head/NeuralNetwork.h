@@ -1,10 +1,7 @@
 #ifndef NEURALNETWORKHEADER
 #define NEURALNETWORKHEADER
 
-#include <vector>
-#include <memory>
 #include "NetworkBuffer.h"
-#include <future>
 
 namespace nn
 {

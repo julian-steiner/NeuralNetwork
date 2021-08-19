@@ -117,5 +117,4 @@ int main()
     std::cout << fittest->fitness << std::endl;
 
     fittest->saveConnectionScheme("Schemes/NeuralNetwork.tex");
-
 }
