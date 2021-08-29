@@ -16,9 +16,9 @@ int main()
     int numberOfNetworks = 50;
     population::Population testPopulation(numberOfNetworks, &templateNetwork);
 
-    testPopulation.weightChangingRate = 1;
+    testPopulation.weightChangingRate = 0.5;
     testPopulation.connectionAddingRate = 0.15;
-    testPopulation.neuronAddingRate = 0.0005;
+    testPopulation.neuronAddingRate = 0.001;
     //testPopulation.connectionAddingRate = 0;
     //testPopulation.neuronAddingRate = 0;
     testPopulation.learningRate = 0.5;
@@ -32,6 +32,8 @@ int main()
     double highestFitness = 0;
 
     int numberOfGenerations = 20000;
+
+    bool solution = false;
 
     while (generation <= numberOfGenerations)
     {
@@ -74,6 +76,11 @@ int main()
 
         generation++;
 
+        if (highestFitness >= 3.99999)
+        {
+            break;
+        }
+
         highestFitness = 0;
 
         testPopulation.speciate();
@@ -82,6 +89,7 @@ int main()
         {
             testPopulation.crossover();
         }
+
 
     }
 

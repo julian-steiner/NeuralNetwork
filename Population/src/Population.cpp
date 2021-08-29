@@ -89,24 +89,40 @@ bool Population::validateConnection(nn::NeuralNetwork* currentNeuralNetwork, con
 
 void Population::handleWeightMutations(nn::NeuralNetwork* currentNeuralNetwork)
 {
-    if (randomGenerator.getRandomNumber() < weightChangingRate)
+    //if (randomGenerator.getRandomNumber() < weightChangingRate)
+    //{
+        //double randomNumber = round(randomGenerator.getRandomNumber() * currentNeuralNetwork->connections->size()-1);
+        //if (randomNumber >= 0)
+        //{
+            //weightMutate(currentNeuralNetwork->connections->at(randomNumber));
+        //}
+    //}
+    for (int i = 0; i < currentNeuralNetwork->connections->size(); i++)
     {
-        double randomNumber = round(randomGenerator.getRandomNumber() * currentNeuralNetwork->connections->size()-1);
-        if (randomNumber >= 0)
+        if (randomGenerator.getRandomNumber() < weightChangingRate)
         {
-            weightMutate(currentNeuralNetwork->connections->at(randomNumber));
+            connection::Connection* currentConnection = currentNeuralNetwork->connections->at(i);
+            weightMutate(currentConnection);
         }
     }
 }
 
 void Population::handleBiasMutations(nn::NeuralNetwork* currentNeuralNetwork)
 {
-    if (randomGenerator.getRandomNumber() < weightChangingRate)
+    //if (randomGenerator.getRandomNumber() < weightChangingRate)
+    //{
+        //double randomNumber = round(randomGenerator.getRandomNumber() * currentNeuralNetwork->neurons->size()-1);
+        //if (randomNumber >= 0)
+        //{
+            //biasMutate(currentNeuralNetwork->neurons->at(randomNumber));
+        //}
+    //}
+    for (int i = 0; i < currentNeuralNetwork->neurons->size(); i++)
     {
-        double randomNumber = round(randomGenerator.getRandomNumber() * currentNeuralNetwork->neurons->size()-1);
-        if (randomNumber >= 0)
+        if (randomGenerator.getRandomNumber() < weightChangingRate)
         {
-            biasMutate(currentNeuralNetwork->neurons->at(randomNumber));
+            neuron::Neuron* currentNeuron = currentNeuralNetwork->neurons->at(i);
+            biasMutate(currentNeuron);
         }
     }
 }
@@ -216,7 +232,7 @@ void Population::crossover()
 {
     std::vector<nn::NeuralNetwork>* nextGeneration = new std::vector<nn::NeuralNetwork>();
 
-    nextGeneration->reserve(networks->size()+5);
+    nextGeneration->reserve(networks->size()+100);
 
     computeChildrenAllowed();
     double children = 0;
