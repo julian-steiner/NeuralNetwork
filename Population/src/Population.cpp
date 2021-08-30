@@ -55,8 +55,8 @@ void Population::assignInnovationNumber(const connection::ConnectionDummy& dummy
 
 connection::NeuronLocation Population::generateRandomNeuronLocation(nn::NeuralNetwork* currentNeuralNetwork)
 {
-    int randomLayerNumber = round(randomGenerator.getRandomNumber() * (currentNeuralNetwork->layers->size()-1));
-    int randomNeuronNumber = round(randomGenerator.getRandomNumber() * (currentNeuralNetwork->layers->at(randomLayerNumber)->neurons.size()-1));
+    int randomLayerNumber = round(randomGenerator.getRandomNumber() * (currentNeuralNetwork->layers->size() - 1));
+    int randomNeuronNumber = round(randomGenerator.getRandomNumber() * (currentNeuralNetwork->layers->at(randomLayerNumber)->neurons.size() - 1));
     return {randomLayerNumber, randomNeuronNumber};
 }
 
@@ -68,8 +68,12 @@ bool Population::validateConnection(nn::NeuralNetwork* currentNeuralNetwork, con
     if (connectionDummy.inNeuronLocation.layer == connectionDummy.outNeuronLocation.layer && connectionDummy.inNeuronLocation.layer != 1) return false;
     if (connectionDummy.inNeuronLocation.layer > connectionDummy.outNeuronLocation.layer) return false;
     // Checking if it's the same neuron
-    if (connectionDummy.inNeuronLocation.layer == connectionDummy.outNeuronLocation.layer) return false;
-    if (connectionDummy.inNeuronLocation.number == connectionDummy.outNeuronLocation.number) return false;
+
+    // CRITICAL IF STATEMENT PLEASE DEBUG THIS
+    if (connectionDummy.inNeuronLocation.layer == connectionDummy.outNeuronLocation.layer && connectionDummy.inNeuronLocation.number == connectionDummy.outNeuronLocation.number) return false;
+    //if (connectionDummy.inNeuronLocation.layer == connectionDummy.outNeuronLocation.layer) return false;
+    //if (connectionDummy.inNeuronLocation.number == connectionDummy.outNeuronLocation.number) return false;
+
     // Checking if the connection would cause recursion
     if (currentNeuralNetwork->checkForRecursion({connectionDummy.inNeuronLocation.layer,
                                                  connectionDummy.inNeuronLocation.number},
