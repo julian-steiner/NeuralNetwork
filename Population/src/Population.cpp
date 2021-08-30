@@ -241,12 +241,33 @@ void Population::crossover()
     double totalFitness = getTotalFitness();
     for (Species& currentSpecies: species)
     {
+        // Adding a mating pool so fitter networks are preferred in the selection
+        std::vector<nn::NeuralNetwork*> matingPool;
+        matingPool.reserve(currentSpecies.networks.size());
+
+        for (int i = 0; i < currentSpecies.networks.size(); i++)
+        {
+            nn::NeuralNetwork* currentNetwork = currentSpecies.networks.at(i);
+            for (int i = 0; round(i < currentNetwork->fitness / currentSpecies.totalFitness * currentSpecies.networks.size()); i++)
+            {
+                matingPool.push_back(currentNetwork);
+            }
+        }
+
+        //for (int i = 0; i < currentSpecies.numChildrenAllowed; i++)
+        //{
+            //double randomNumber1 = round((std::rand() / (double)RAND_MAX) * (currentSpecies.networks.size()-1));
+            //double randomNumber2 = round((std::rand() / (double)RAND_MAX) * (currentSpecies.networks.size()-1));
+
+            //nextGeneration->push_back(getChild(currentSpecies.networks.at(randomNumber1), currentSpecies.networks.at(randomNumber2)));
+        //}
+
         for (int i = 0; i < currentSpecies.numChildrenAllowed; i++)
         {
-            double randomNumber1 = round((std::rand() / (double)RAND_MAX) * (currentSpecies.networks.size()-1));
-            double randomNumber2 = round((std::rand() / (double)RAND_MAX) * (currentSpecies.networks.size()-1));
+            double randomNumber1 = round((std::rand() / (double)RAND_MAX) * (matingPool.size()-1));
+            double randomNumber2 = round((std::rand() / (double)RAND_MAX) * (matingPool.size()-1));
 
-            nextGeneration->push_back(getChild(currentSpecies.networks.at(randomNumber1), currentSpecies.networks.at(randomNumber2)));
+            nextGeneration->push_back(getChild(matingPool.at(randomNumber1), matingPool.at(randomNumber2)));
         }
     }
 

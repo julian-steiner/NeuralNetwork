@@ -18,9 +18,9 @@ int main()
 
     testPopulation.weightChangingRate = 0.5;
     testPopulation.connectionAddingRate = 0.15;
-    testPopulation.neuronAddingRate = 0.001;
+    //testPopulation.neuronAddingRate = 0.001;
     //testPopulation.connectionAddingRate = 0;
-    //testPopulation.neuronAddingRate = 0;
+    testPopulation.neuronAddingRate = 0;
     testPopulation.learningRate = 0.5;
 
     testPopulation.targetNumberOfSpecies = 5;
@@ -48,7 +48,7 @@ int main()
             double result = 0;
 
             result = currentNetwork->predict({1, 1}).at(0);
-            error += pow(pow(result - 0, 2), 0.5);
+            error += pow(pow(result - 1, 2), 0.5);
             result = currentNetwork->predict({0, 0}).at(0);
             error += pow(pow(result - 0, 2), 0.5);
             result = currentNetwork->predict({1, 0}).at(0);
@@ -94,7 +94,7 @@ int main()
     }
 
     std::cout << "Fittest Number of connections: " << fittest->connections->size() << std::endl;
-    std::cout << "Fittest Number of neurons: " << fittest->layers->at(1)->neurons.size() << std::endl;
+    std::cout << "Fittest Number of neurons: " << fittest->neurons->size() << std::endl;
     std::cout << "Fitness of fittest: " << fittest->fitness << std::endl;
 
     std::vector<nn::Layer*> layers;
