@@ -155,7 +155,7 @@ double Neuron::activate(double value)
             return 1 / (1 + exp(-value));
 
         case neuron::Activation::Binary:
-            return (double)value == 1;
+            return (double)value >= 0.5;
         
         default:
             return 0;
