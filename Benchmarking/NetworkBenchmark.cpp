@@ -7,20 +7,20 @@ int main()
 {
     nn::NeuralNetwork templateNetwork;
     templateNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
-    templateNetwork.addLayer(0, neuron::Activation::Sigmoid, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
-    //templateNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Hidden, nn::LayerConnectionType::FullyConnected);
-    templateNetwork.addLayer(1, neuron::Activation::Binary, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
+    //templateNetwork.addLayer(0, neuron::Activation::Sigmoid, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
+    templateNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Hidden, nn::LayerConnectionType::FullyConnected);
+    templateNetwork.addLayer(1, neuron::Activation::Sigmoid, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
     //templateNetwork.connect({0, 0}, {2, 0});
     //templateNetwork.connect({0, 1}, {2, 0});
 
     int numberOfNetworks = 200;
     population::Population testPopulation(numberOfNetworks, &templateNetwork);
 
-    testPopulation.weightChangingRate = 0.1;
+    testPopulation.weightChangingRate = 0.01;
     testPopulation.connectionAddingRate = 0.0015;
     testPopulation.neuronAddingRate = 0.0001;
-    //testPopulation.connectionAddingRate = 0;
-    //testPopulation.neuronAddingRate = 0;
+    testPopulation.connectionAddingRate = 0;
+    testPopulation.neuronAddingRate = 0;
     testPopulation.learningRate = 0.5;
 
     testPopulation.targetNumberOfSpecies = 4;
@@ -125,4 +125,9 @@ int main()
     std::cout << fittest->fitness << std::endl;
 
     fittest->saveConnectionScheme("Schemes/NeuralNetwork.tex");
+
+    for (connection::Connection* conn : *fittest->connections)
+    {
+        std::cout << conn->weight << " {" << conn->inNeuronLocation.layer << " " << conn->inNeuronLocation.number << "} " << " ---> " << " {" << conn->outNeuronLocation.layer << " " << conn->outNeuronLocation.number << "} " << std::endl;
+    }
 }

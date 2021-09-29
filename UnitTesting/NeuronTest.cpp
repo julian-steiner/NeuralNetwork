@@ -19,7 +19,7 @@ TEST(Neuron, NeuronInitializedCorrectly)
 TEST(Neuron, BinaryActivationWorkingCorrectly)
 {
     neuron::Neuron testNeuron = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Binary, false);
-    testNeuron.value = 0.5;
+    testNeuron.value = -0.5;
 
     neuron::Neuron testNeuron2 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::Binary, false);
     testNeuron2.bias = 0;

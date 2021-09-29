@@ -196,20 +196,25 @@ TEST(NeuralNetwork, FeedforwardWorkingCorrectly)
 {
     nn::NeuralNetwork testNetwork;
     testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
-    testNetwork.addLayer(2, neuron::Activation::Binary, nn::LayerType::Hidden, nn::LayerConnectionType::FullyConnected);
-    testNetwork.addLayer(1, neuron::Activation::Binary, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Hidden, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(1, neuron::Activation::Sigmoid, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
     
-    testNetwork.connections->at(0)->weight = 1;
-    testNetwork.connections->at(1)->weight = 1;
-    testNetwork.connections->at(2)->weight = -1;
-    testNetwork.connections->at(3)->weight = -1;
-    testNetwork.connections->at(4)->weight = 1;
-    testNetwork.connections->at(5)->weight = 1;
+    testNetwork.connections->at(0)->weight = -14;
+    testNetwork.connections->at(1)->weight = 10;
+    testNetwork.connections->at(2)->weight = -10;
+    testNetwork.connections->at(3)->weight = 10;
+    testNetwork.connections->at(4)->weight = 26;
+    testNetwork.connections->at(5)->weight = -25;
 
-    ASSERT_EQ(testNetwork.predict({0, 0}).at(0), 0);
-    ASSERT_EQ(testNetwork.predict({0, 1}).at(0), 1);
-    ASSERT_EQ(testNetwork.predict({1, 0}).at(0), 1);
-    ASSERT_EQ(testNetwork.predict({1, 1}).at(0), 0);
+    std::cout << testNetwork.predict({0, 0}).at(0) << "\n";
+    std::cout << testNetwork.predict({0, 1}).at(0) << "\n";
+    std::cout << testNetwork.predict({1, 0}).at(0) << "\n";
+    std::cout << testNetwork.predict({1, 1}).at(0) << "\n";
+
+    ASSERT_EQ(testNetwork.predict({0, 0}).at(0) < 0.5, 1);
+    ASSERT_EQ(testNetwork.predict({0, 1}).at(0) > 0.5, 1);
+    ASSERT_EQ(testNetwork.predict({1, 0}).at(0) > 0.5, 1);
+    ASSERT_EQ(testNetwork.predict({1, 1}).at(0) < 0.5, 1);
 }
 
 TEST(NeuralNetwork, NetworkCopiedCorrectly)

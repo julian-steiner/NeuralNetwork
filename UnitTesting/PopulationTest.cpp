@@ -17,8 +17,7 @@ TEST(Population, PopulationCreatedCorrectly)
     population::Population testPopulation(10, &testNetwork);
 
     ASSERT_EQ(testPopulation.getNetwork(8)->layers->at(1)->neurons.at(0)->bias, 69);
-    ASSERT_EQ(testPopulation.getNetwork(8)->layers->at(1)->neurons.at(0)->connections_forward.at(0)->innovationNumber, 420);
-    ASSERT_EQ(testPopulation.getCurrentInnovationNumber(), 420);
+    ASSERT_EQ(testPopulation.getNetwork(8)->layers->at(1)->neurons.at(0)->connections_forward.at(0)->innovationNumber, 1);
 }
 
 TEST(Population, PopulationAddingConnectionCorrectly)
@@ -79,6 +78,8 @@ TEST(Population, CrossingOverworkingCorrectly)
     testPopulation.getNetwork(0)->connections->at(0)->weight = 420;
     testPopulation.getNetwork(0)->connections->at(1)->weight = 69;
     testPopulation.getNetwork(1)->fitness = 1;
+
+    testPopulation.speciate();
 
     testPopulation.crossover();
 
