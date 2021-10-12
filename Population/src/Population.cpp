@@ -25,6 +25,36 @@ Population::Population(const int& size, nn::NeuralNetwork* templateNetwork)
     }
 }
 
+Population::Population(const int& size, const int& numInputs, const int& numOutputs)
+{
+    nn::NeuralNetwork templateANN;
+    templateANN.addLayer(numInputs, neuron::Activation::None, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    templateANN.addLayer(0, neuron::Activation::Sigmoid, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
+    templateANN.addLayer(numOutputs, neuron::Activation::Sigmoid, nn::LayerType::Output, nn::LayerConnectionType::CustomConnected);
+
+    nn::NeuralNetwork* templateNetwork = &templateANN;
+
+    targetNumberOfOrganisms = size;
+
+    // Creating the networks vector
+    this->networks = new std::vector<nn::NeuralNetwork>();
+    this->networks->reserve(size);
+
+    // Assigning innovation numbers to the network template
+    for (connection::Connection* currentConnection: *templateNetwork->connections)
+    {
+        int innovationNumber;
+        assignInnovationNumber({currentConnection->inNeuronLocation, currentConnection->outNeuronLocation, 0}, innovationNumber);
+        currentConnection->innovationNumber = innovationNumber;
+    }
+
+    // Filling the networks
+    for (int i = 0; i < size; i++)
+    {
+        this->networks->push_back(templateNetwork->getCopy<nn::NeuralNetwork>());
+    }
+}
+
 Population::~Population()
 {
     delete this->networks;
@@ -93,14 +123,6 @@ bool Population::validateConnection(nn::NeuralNetwork* currentNeuralNetwork, con
 
 void Population::handleWeightMutations(nn::NeuralNetwork* currentNeuralNetwork)
 {
-    //if (randomGenerator.getRandomNumber() < weightChangingRate)
-    //{
-        //double randomNumber = round(randomGenerator.getRandomNumber() * currentNeuralNetwork->connections->size()-1);
-        //if (randomNumber >= 0)
-        //{
-            //weightMutate(currentNeuralNetwork->connections->at(randomNumber));
-        //}
-    //}
     for (int i = 0; i < currentNeuralNetwork->connections->size(); i++)
     {
         if (randomGenerator.getRandomNumber() < weightChangingRate)
@@ -257,14 +279,6 @@ void Population::crossover()
                 matingPool.push_back(currentNetwork);
             }
         }
-
-        //for (int i = 0; i < currentSpecies.numChildrenAllowed; i++)
-        //{
-            //double randomNumber1 = round((std::rand() / (double)RAND_MAX) * (currentSpecies.networks.size()-1));
-            //double randomNumber2 = round((std::rand() / (double)RAND_MAX) * (currentSpecies.networks.size()-1));
-
-            //nextGeneration->push_back(getChild(currentSpecies.networks.at(randomNumber1), currentSpecies.networks.at(randomNumber2)));
-        //}
 
         for (int i = 0; i < currentSpecies.numChildrenAllowed; i++)
         {

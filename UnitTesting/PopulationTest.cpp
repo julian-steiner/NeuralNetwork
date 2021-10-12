@@ -20,6 +20,15 @@ TEST(Population, PopulationCreatedCorrectly)
     ASSERT_EQ(testPopulation.getNetwork(8)->layers->at(1)->neurons.at(0)->connections_forward.at(0)->innovationNumber, 1);
 }
 
+TEST(Population, PopulationCreatingEmptynetworkCorrectly)
+{
+    population::Population testPopulation(10, 2, 2);
+
+    ASSERT_EQ(testPopulation.getSize(), 10);
+    ASSERT_EQ(testPopulation.getNetwork(8)->layers->at(0)->neurons.size(), 2);
+    ASSERT_EQ(testPopulation.getNetwork(8)->layers->at(2)->neurons.size(), 2);
+}
+
 TEST(Population, PopulationAddingConnectionCorrectly)
 {
     nn::NeuralNetwork testNetwork;

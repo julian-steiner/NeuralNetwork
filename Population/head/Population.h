@@ -53,6 +53,7 @@ namespace population
 
         // Constructor
         Population(const int& size, nn::NeuralNetwork* templateNetwork);
+        Population(const int& size, const int& numInputs, const int& numOutputs);
         ~Population();
 
         // Getters
@@ -70,7 +71,6 @@ namespace population
         std::vector<connection::ConnectionDummy> connectionDatabase;
         std::vector<nn::NeuralNetwork>* networks;
         std::vector<Species> species;
-
 
         // Methods for mutation
         connection::NeuronLocation generateRandomNeuronLocation(nn::NeuralNetwork* currentNeuralNetwork);
