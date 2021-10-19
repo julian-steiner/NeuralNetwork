@@ -100,9 +100,9 @@ bool Population::validateConnection(nn::NeuralNetwork* currentNeuralNetwork, con
     // Checking if it's the same neuron
 
     // CRITICAL IF STATEMENT PLEASE DEBUG THIS
-    if (connectionDummy.inNeuronLocation.layer == connectionDummy.outNeuronLocation.layer && connectionDummy.inNeuronLocation.number == connectionDummy.outNeuronLocation.number) return false;
-    //if (connectionDummy.inNeuronLocation.layer == connectionDummy.outNeuronLocation.layer) return false;
-    //if (connectionDummy.inNeuronLocation.number == connectionDummy.outNeuronLocation.number) return false;
+    //if (connectionDummy.inNeuronLocation.layer == connectionDummy.outNeuronLocation.layer && connectionDummy.inNeuronLocation.number == connectionDummy.outNeuronLocation.number) return false;
+    if (connectionDummy.inNeuronLocation.layer == connectionDummy.outNeuronLocation.layer) return false;
+    if (connectionDummy.inNeuronLocation.number == connectionDummy.outNeuronLocation.number) return false;
 
     // Checking if the connection would cause recursion
     if (currentNeuralNetwork->checkForRecursion({connectionDummy.inNeuronLocation.layer,

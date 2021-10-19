@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "NetworkBuffer.h"
 #include "NeuralNetwork.h"
+#include "Logger.h"
 #include <cstdlib>
 
 TEST(NetworkBuffer, BufferInitializedCorrectly)
@@ -245,4 +246,17 @@ TEST(NeuralNetwork, NetworkCopiedCorrectly)
         connection::ConnectionDummy connection = testNetwork2.layers->at(3)->connectionDummys.at(0);
         ASSERT_EQ(testNetwork2.layers->at(connection.inNeuronLocation.layer)->neurons.at(connection.inNeuronLocation.number)->bias, 69);
     }
+}
+
+TEST(NeuralNetwork, LoggerWorking)
+{
+    nn::NeuralNetwork testNetwork;
+    testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Hidden, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(1, neuron::Activation::Sigmoid, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
+
+    logging::Logger log("Log.tex");
+
+    log.addNetwork(testNetwork, 1);
+    log.addNetwork(testNetwork, 10);
 }
