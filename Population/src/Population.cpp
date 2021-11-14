@@ -28,7 +28,7 @@ Population::Population(const int& size, nn::NeuralNetwork* templateNetwork)
 Population::Population(const int& size, const int& numInputs, const int& numOutputs)
 {
     nn::NeuralNetwork templateANN;
-    templateANN.addLayer(numInputs, neuron::Activation::None, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    templateANN.addLayer(numInputs, neuron::Activation::Without, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
     templateANN.addLayer(0, neuron::Activation::Sigmoid, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
     templateANN.addLayer(numOutputs, neuron::Activation::Sigmoid, nn::LayerType::Output, nn::LayerConnectionType::CustomConnected);
 

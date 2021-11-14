@@ -36,7 +36,7 @@ TEST(Neuron, BinaryActivationWorkingCorrectly)
 
 TEST(Neuron, InputNeuronComputingCorrectly)
 {
-    neuron::Neuron testNeuron = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::None, false);
+    neuron::Neuron testNeuron = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Without, false);
     testNeuron.value = 53;
     testNeuron.bias = 23103910;
 
@@ -123,10 +123,10 @@ TEST(Neuron, ReverseCalculateWorkingCorrectly)
     neuron::Neuron testNeuron2 = neuron::Neuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, false);
     testNeuron2.value = 100;
 
-    neuron::Neuron testNeuron3 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::None, false);
+    neuron::Neuron testNeuron3 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::Without, false);
     testNeuron3.bias = 3;
 
-    neuron::Neuron testNeuron4 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::None, false);
+    neuron::Neuron testNeuron4 = neuron::Neuron(neuron::NeuronType::Hidden, neuron::Activation::Without, false);
     testNeuron4.bias = 4;
 
     connection::Connection connection1 = connection::Connection(&testNeuron, &testNeuron3);

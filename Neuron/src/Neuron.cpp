@@ -148,7 +148,7 @@ double Neuron::activate(double value)
 {
     switch(this->activation)
     {
-        case neuron::Activation::None:
+        case neuron::Activation::Without:
             return this->value;
 
         case neuron::Activation::Sigmoid:

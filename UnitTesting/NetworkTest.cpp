@@ -15,7 +15,7 @@ TEST(NetworkBuffer, NeuronCorrectlyAdded)
 {
     nn::NetworkBuffer testNetwork;
 
-    testNetwork.addLayer(0, neuron::Activation::None, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(0, neuron::Activation::Without, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
     testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, 0);
 
     ASSERT_EQ(testNetwork.neurons->size(), 1);
@@ -25,7 +25,7 @@ TEST(NetworkBuffer, ConnectionCorrectlyAdded)
 {
     nn::NetworkBuffer testNetwork;
 
-    testNetwork.addLayer(0, neuron::Activation::None, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(0, neuron::Activation::Without, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
     testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, 0);
     testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, 0);
     testNetwork.connect({0, 0}, {0, 1});
@@ -37,16 +37,16 @@ TEST(NetworkBuffer, ConnectionCorrectlyAdded)
 TEST(NetworkBuffer, ConnectingWorkingCorrectly)
 {
     nn::NetworkBuffer testNetwork;
-    testNetwork.addLayer(0, neuron::Activation::None, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(0, neuron::Activation::Without, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
     testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::Sigmoid, 0);
-    testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::None, 0);
+    testNetwork.addNeuron(neuron::NeuronType::Input, neuron::Activation::Without, 0);
     
     testNetwork.connect({0, 0}, {0, 1});
 
     ASSERT_EQ(testNetwork.neurons->size(), 2);
     ASSERT_EQ(testNetwork.connections->size(), 1);
     ASSERT_EQ(testNetwork.connections->at(0)->in->activation, neuron::Activation::Sigmoid);
-    ASSERT_EQ(testNetwork.connections->at(0)->out->activation, neuron::Activation::None);
+    ASSERT_EQ(testNetwork.connections->at(0)->out->activation, neuron::Activation::Without);
 }
 
 TEST(NetworkBuffer, LayersCorrectlyAdded)
@@ -158,10 +158,10 @@ TEST(NetworkBuffer, PrintingCorrectly)
 {
     nn::NetworkBuffer testNetworkBuffer;
 
-    testNetworkBuffer.addLayer(2, neuron::Activation::None, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
-    testNetworkBuffer.addLayer(3, neuron::Activation::None, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
-    testNetworkBuffer.addLayer(2, neuron::Activation::None, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
-    testNetworkBuffer.addLayer(2, neuron::Activation::None, nn::LayerType::Output, nn::LayerConnectionType::CustomConnected);
+    testNetworkBuffer.addLayer(2, neuron::Activation::Without, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetworkBuffer.addLayer(3, neuron::Activation::Without, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
+    testNetworkBuffer.addLayer(2, neuron::Activation::Without, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
+    testNetworkBuffer.addLayer(2, neuron::Activation::Without, nn::LayerType::Output, nn::LayerConnectionType::CustomConnected);
 
     testNetworkBuffer.connect({0, 0}, {1, 0});
     testNetworkBuffer.connect({0, 0}, {1, 1});

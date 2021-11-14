@@ -6,7 +6,7 @@ TEST(Population, PopulationCreatedCorrectly)
 {
     nn::NeuralNetwork testNetwork;
 
-    testNetwork.addLayer(4, neuron::Activation::None, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(4, neuron::Activation::Without, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
     testNetwork.addLayer(0, neuron::Activation::Sigmoid, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
     testNetwork.addLayer(2, neuron::Activation::Sigmoid, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
 
@@ -35,9 +35,9 @@ TEST(Population, PopulationAddingConnectionCorrectly)
 
     std::srand(time(NULL));
 
-    testNetwork.addLayer(1, neuron::Activation::None, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
-    testNetwork.addLayer(0, neuron::Activation::None, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
-    testNetwork.addLayer(1, neuron::Activation::None, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(1, neuron::Activation::Without, nn::LayerType::Input, nn::LayerConnectionType::FullyConnected);
+    testNetwork.addLayer(0, neuron::Activation::Without, nn::LayerType::CustomConnectedHidden, nn::LayerConnectionType::CustomConnected);
+    testNetwork.addLayer(1, neuron::Activation::Without, nn::LayerType::Output, nn::LayerConnectionType::FullyConnected);
 
     population::Population testPopulation(1, &testNetwork);
     testPopulation.weightChangingRate = 0;

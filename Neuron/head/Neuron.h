@@ -9,7 +9,7 @@ namespace connection
 namespace neuron
 {
     enum NeuronType {Input, Hidden, Output};
-    enum Activation {Sigmoid, Binary, None};
+    enum Activation {Sigmoid, Binary, Without};
 
     struct Neuron
     {
